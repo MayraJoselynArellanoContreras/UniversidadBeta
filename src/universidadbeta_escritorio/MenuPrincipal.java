@@ -97,7 +97,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         jLabel4.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\calendar-clock.png")); // NOI18N
         jLabel4.setText("Pagos");
 
-        verPagos.setBackground(new java.awt.Color(255, 51, 0));
+        verPagos.setBackground(new java.awt.Color(255, 0, 204));
         verPagos.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-up-right.png")); // NOI18N
         verPagos.setText("Entrar");
 
