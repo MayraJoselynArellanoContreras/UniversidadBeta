@@ -73,6 +73,7 @@ public class Reportes extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        botonReporteAnual.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\layer-minus.png")); // NOI18N
         botonReporteAnual.setText("Generar PDF");
         botonReporteAnual.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -82,6 +83,7 @@ public class Reportes extends javax.swing.JFrame {
 
         jLabel3.setText("Reporte Anual");
 
+        botonReporteMensual.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\layer-minus.png")); // NOI18N
         botonReporteMensual.setText("Generar PDF");
         botonReporteMensual.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -89,14 +91,17 @@ public class Reportes extends javax.swing.JFrame {
             }
         });
 
+        botonPagosVencidos.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\layer-minus.png")); // NOI18N
         botonPagosVencidos.setText("Generar PDF");
 
         jLabel4.setText("Reporte Mensual");
 
         jLabel5.setText("Pagos Vencidos");
 
+        botonDonativosEvento.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\layer-minus.png")); // NOI18N
         botonDonativosEvento.setText("Generar PDF");
 
+        botonRepresentantes.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\layer-minus.png")); // NOI18N
         botonRepresentantes.setText("Generar PDF");
 
         jLabel6.setText("Donativos por evento");
@@ -140,7 +145,7 @@ public class Reportes extends javax.swing.JFrame {
                             .addComponent(jLabel4)
                             .addGap(71, 71, 71)
                             .addComponent(botonReporteMensual))))
-                .addContainerGap(113, Short.MAX_VALUE))
+                .addContainerGap(93, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addComponent(botonVolver)
                 .addGap(0, 0, Short.MAX_VALUE))

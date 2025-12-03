@@ -55,7 +55,7 @@
                       </Group>
                   </Group>
               </Group>
-              <EmptySpace pref="113" max="32767" attributes="0"/>
+              <EmptySpace pref="93" max="32767" attributes="0"/>
           </Group>
           <Group type="102" alignment="0" attributes="0">
               <Component id="botonVolver" min="-2" max="-2" attributes="0"/>
@@ -151,6 +151,9 @@
     </Container>
     <Component class="javax.swing.JButton" name="botonReporteAnual">
       <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="2" name="C:\Users\contr\Downloads\layer-minus.png"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Generar PDF"/>
       </Properties>
       <Events>
@@ -164,6 +167,9 @@
     </Component>
     <Component class="javax.swing.JButton" name="botonReporteMensual">
       <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="2" name="C:\Users\contr\Downloads\layer-minus.png"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Generar PDF"/>
       </Properties>
       <Events>
@@ -172,6 +178,9 @@
     </Component>
     <Component class="javax.swing.JButton" name="botonPagosVencidos">
       <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="2" name="C:\Users\contr\Downloads\layer-minus.png"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Generar PDF"/>
       </Properties>
     </Component>
@@ -187,11 +196,17 @@
     </Component>
     <Component class="javax.swing.JButton" name="botonDonativosEvento">
       <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="2" name="C:\Users\contr\Downloads\layer-minus.png"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Generar PDF"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="botonRepresentantes">
       <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="2" name="C:\Users\contr\Downloads\layer-minus.png"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Generar PDF"/>
       </Properties>
     </Component>
