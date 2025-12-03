@@ -100,11 +100,16 @@ public class MenuPrincipal extends javax.swing.JFrame {
         verPagos.setBackground(new java.awt.Color(255, 0, 204));
         verPagos.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-up-right.png")); // NOI18N
         verPagos.setText("Entrar");
+        verPagos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                verPagosActionPerformed(evt);
+            }
+        });
 
         jLabel5.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\calendar-lines-pen.png")); // NOI18N
         jLabel5.setText("Eventos");
 
-        verEventos.setBackground(new java.awt.Color(255, 0, 51));
+        verEventos.setBackground(new java.awt.Color(0, 153, 204));
         verEventos.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-up-right.png")); // NOI18N
         verEventos.setText("Entrar");
         verEventos.addActionListener(new java.awt.event.ActionListener() {
@@ -199,13 +204,19 @@ public class MenuPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_botonVerDonadoresActionPerformed
 
     private void verEventosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verEventosActionPerformed
-        // TODO add your handling code here:
+       Eventos ventana = new Eventos();
+    ventana.setVisible(true);
     }//GEN-LAST:event_verEventosActionPerformed
 
     private void botonVerDonativosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonVerDonativosActionPerformed
          Donativos ventana = new Donativos();
     ventana.setVisible(true);
     }//GEN-LAST:event_botonVerDonativosActionPerformed
+
+    private void verPagosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verPagosActionPerformed
+        Pagos ventana = new Pagos();
+    ventana.setVisible(true);
+    }//GEN-LAST:event_verPagosActionPerformed
 
     /**
      * @param args the command line arguments
