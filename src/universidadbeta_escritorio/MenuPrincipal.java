@@ -136,6 +136,11 @@ public class MenuPrincipal extends javax.swing.JFrame {
         verReportes.setBackground(new java.awt.Color(255, 0, 0));
         verReportes.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-up-right.png")); // NOI18N
         verReportes.setText("Entrar");
+        verReportes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                verReportesActionPerformed(evt);
+            }
+        });
 
         botonCerrarSesion.setBackground(new java.awt.Color(255, 153, 0));
         botonCerrarSesion.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\exit.png")); // NOI18N
@@ -240,6 +245,11 @@ public class MenuPrincipal extends javax.swing.JFrame {
     // Volver a mostrar el Login
     new Login().setVisible(true);
     }//GEN-LAST:event_botonCerrarSesionActionPerformed
+
+    private void verReportesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verReportesActionPerformed
+        Reportes ventana = new Reportes();
+    ventana.setVisible(true);
+    }//GEN-LAST:event_verReportesActionPerformed
 
     /**
      * @param args the command line arguments
