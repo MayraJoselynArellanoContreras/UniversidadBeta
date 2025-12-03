@@ -87,6 +87,11 @@ public class Login extends javax.swing.JFrame {
 
         botonIniciarSesion.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\angle-right.png")); // NOI18N
         botonIniciarSesion.setText("Iniciar Sesion");
+        botonIniciarSesion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonIniciarSesionActionPerformed(evt);
+            }
+        });
 
         botonSalir.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\exit.png")); // NOI18N
         botonSalir.setText("Salir");
@@ -147,6 +152,40 @@ public class Login extends javax.swing.JFrame {
     private void botonSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonSalirActionPerformed
      System.exit(0);
     }//GEN-LAST:event_botonSalirActionPerformed
+
+    private void botonIniciarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonIniciarSesionActionPerformed
+       String usuario = txtUsuario.getText().trim();
+    String password = new String(txtContraseña.getPassword());
+
+    // TUS DATOS CORRECTOS
+    if (usuario.equals("Mayra") && password.equals("12345")) {
+        
+        // OCULTA el login
+        this.dispose();
+        
+        // ABRE el menú principal (o cualquier ventana que quieras)
+        new MenuPrincipal().setVisible(true);  
+        
+    // SIN WARNINGS
+        javax.swing.JOptionPane.showMessageDialog(
+            null,
+            "¡Bienvenida, Mayra!",
+            "Acceso concedido",
+            javax.swing.JOptionPane.INFORMATION_MESSAGE
+        );
+
+    } else {
+        javax.swing.JOptionPane.showMessageDialog(
+            null,
+            "Usuario o contraseña incorrectos",
+            "Error de inicio de sesión",
+            javax.swing.JOptionPane.ERROR_MESSAGE
+        );
+        
+        txtContraseña.setText("");           
+        txtUsuario.requestFocus();        
+    }
+    }//GEN-LAST:event_botonIniciarSesionActionPerformed
 
     /**
      * @param args the command line arguments

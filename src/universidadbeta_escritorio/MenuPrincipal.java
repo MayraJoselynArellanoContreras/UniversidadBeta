@@ -239,11 +239,9 @@ public class MenuPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_verRepresentantesActionPerformed
 
     private void botonCerrarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCerrarSesionActionPerformed
-        // Opción 1: Ocultar la ventana actual
-    this.dispose(); // Cierra solo esta ventana
-    
-    // Volver a mostrar el Login
+        Login login = new Login();  
     new Login().setVisible(true);
+    this.dispose();
     }//GEN-LAST:event_botonCerrarSesionActionPerformed
 
     private void verReportesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verReportesActionPerformed
