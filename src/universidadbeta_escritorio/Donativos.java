@@ -63,6 +63,7 @@ public class Donativos extends javax.swing.JFrame {
 
         jPanel1.setBackground(new java.awt.Color(0, 204, 204));
 
+        jLabel1.setFont(new java.awt.Font("Yu Gothic", 1, 18)); // NOI18N
         jLabel1.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\folder-download.png")); // NOI18N
         jLabel1.setText("Registro de donativo/garantia");
 
@@ -80,7 +81,7 @@ public class Donativos extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jLabel2.setText("Donador: ");

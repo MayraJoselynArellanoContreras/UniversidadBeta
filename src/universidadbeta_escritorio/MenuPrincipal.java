@@ -121,9 +121,14 @@ public class MenuPrincipal extends javax.swing.JFrame {
         jLabel6.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\people-poll.png")); // NOI18N
         jLabel6.setText("Representantes");
 
-        verRepresentantes.setBackground(new java.awt.Color(255, 0, 51));
+        verRepresentantes.setBackground(new java.awt.Color(51, 153, 255));
         verRepresentantes.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-up-right.png")); // NOI18N
         verRepresentantes.setText("Entrar");
+        verRepresentantes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                verRepresentantesActionPerformed(evt);
+            }
+        });
 
         jLabel7.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\file-invoice.png")); // NOI18N
         jLabel7.setText("Reportes");
@@ -135,6 +140,11 @@ public class MenuPrincipal extends javax.swing.JFrame {
         botonCerrarSesion.setBackground(new java.awt.Color(255, 153, 0));
         botonCerrarSesion.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\exit.png")); // NOI18N
         botonCerrarSesion.setText("Cerrar Sesion ");
+        botonCerrarSesion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonCerrarSesionActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -217,6 +227,19 @@ public class MenuPrincipal extends javax.swing.JFrame {
         Pagos ventana = new Pagos();
     ventana.setVisible(true);
     }//GEN-LAST:event_verPagosActionPerformed
+
+    private void verRepresentantesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verRepresentantesActionPerformed
+        Representantes ventana = new Representantes();
+    ventana.setVisible(true);
+    }//GEN-LAST:event_verRepresentantesActionPerformed
+
+    private void botonCerrarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCerrarSesionActionPerformed
+        // Opción 1: Ocultar la ventana actual
+    this.dispose(); // Cierra solo esta ventana
+    
+    // Volver a mostrar el Login
+    new Login().setVisible(true);
+    }//GEN-LAST:event_botonCerrarSesionActionPerformed
 
     /**
      * @param args the command line arguments
