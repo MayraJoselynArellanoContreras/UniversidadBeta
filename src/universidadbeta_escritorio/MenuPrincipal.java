@@ -43,11 +43,13 @@ public class MenuPrincipal extends javax.swing.JFrame {
         jLabel7 = new javax.swing.JLabel();
         verReportes = new javax.swing.JButton();
         botonCerrarSesion = new javax.swing.JButton();
+        jLabel8 = new javax.swing.JLabel();
+        botonCorporaciones = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 204));
 
-        jPanel1.setBackground(new java.awt.Color(204, 204, 0));
+        jPanel1.setBackground(new java.awt.Color(0, 153, 255));
 
         jLabel1.setFont(new java.awt.Font("Yu Gothic Medium", 0, 18)); // NOI18N
         jLabel1.setText("Menu Principal");
@@ -73,7 +75,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         jLabel2.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\handshake.png")); // NOI18N
         jLabel2.setText("Donadores");
 
-        botonVerDonadores.setBackground(new java.awt.Color(255, 204, 204));
+        botonVerDonadores.setBackground(new java.awt.Color(204, 204, 0));
         botonVerDonadores.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-up-right.png")); // NOI18N
         botonVerDonadores.setText("Entrar");
         botonVerDonadores.addActionListener(new java.awt.event.ActionListener() {
@@ -151,12 +153,27 @@ public class MenuPrincipal extends javax.swing.JFrame {
             }
         });
 
+        jLabel8.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\phone-office (1).png")); // NOI18N
+        jLabel8.setText("Corporaciones");
+
+        botonCorporaciones.setBackground(new java.awt.Color(153, 153, 153));
+        botonCorporaciones.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-up-right.png")); // NOI18N
+        botonCorporaciones.setText("Entrar");
+        botonCorporaciones.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonCorporacionesActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
+                .addComponent(botonCerrarSesion)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(23, 23, 23)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2)
@@ -165,49 +182,52 @@ public class MenuPrincipal extends javax.swing.JFrame {
                     .addComponent(botonVerDonadores))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 75, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(botonVerDonativos)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel6)
-                    .addComponent(verRepresentantes))
-                .addGap(34, 34, 34)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(verPagos)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel7)
-                    .addComponent(verReportes))
+                    .addComponent(botonCorporaciones)
+                    .addComponent(jLabel8)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(botonVerDonativos)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel6)
+                            .addComponent(verRepresentantes))
+                        .addGap(34, 34, 34)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(verPagos)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel7)
+                            .addComponent(verReportes))))
                 .addGap(33, 33, 33))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(163, 163, 163)
-                .addComponent(botonCerrarSesion)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
                     .addComponent(jLabel3)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel2))
+                    .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(botonVerDonadores)
                     .addComponent(botonVerDonativos)
                     .addComponent(verPagos))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
+                .addGap(27, 27, 27)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(jLabel6)
                     .addComponent(jLabel7))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(verEventos)
                     .addComponent(verRepresentantes)
                     .addComponent(verReportes))
-                .addGap(43, 43, 43)
-                .addComponent(botonCerrarSesion)
-                .addContainerGap())
+                .addGap(18, 18, 18)
+                .addComponent(jLabel8)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(botonCorporaciones)
+                .addGap(15, 15, 15)
+                .addComponent(botonCerrarSesion))
         );
 
         pack();
@@ -249,6 +269,11 @@ public class MenuPrincipal extends javax.swing.JFrame {
     ventana.setVisible(true);
     }//GEN-LAST:event_verReportesActionPerformed
 
+    private void botonCorporacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCorporacionesActionPerformed
+       Corporacion ventana = new Corporacion();
+    ventana.setVisible(true);
+    }//GEN-LAST:event_botonCorporacionesActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -277,6 +302,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botonCerrarSesion;
+    private javax.swing.JButton botonCorporaciones;
     private javax.swing.JButton botonVerDonadores;
     private javax.swing.JButton botonVerDonativos;
     private javax.swing.JLabel jLabel1;
@@ -286,6 +312,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JButton verEventos;
     private javax.swing.JButton verPagos;
