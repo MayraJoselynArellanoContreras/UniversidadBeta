@@ -47,7 +47,6 @@ public class Donadores extends javax.swing.JFrame {
 private void configurarspinnerAñoGraduacion() {
      int añoActual = java.time.Year.now().getValue();
     
-    // ESPECIFICAR Integer.class explícitamente
     javax.swing.SpinnerNumberModel model = new javax.swing.SpinnerNumberModel(
         añoActual,          // Valor inicial
         1990,               // Mínimo
@@ -55,15 +54,14 @@ private void configurarspinnerAñoGraduacion() {
         1                   // Incremento
     );
     
-    // ESTA LÍNEA ES CLAVE: Forzar a usar Integer
     model.setValue(Integer.valueOf(añoActual));
     
     spinnerAñoGraduacion.setModel(model);
     
-    // Configurar editor sin separadores de miles
+
     javax.swing.JSpinner.NumberEditor editor = new javax.swing.JSpinner.NumberEditor(
         spinnerAñoGraduacion, 
-        "####"  // Formato de 4 dígitos
+        "####"  
     );
     
     spinnerAñoGraduacion.setEditor(editor);
@@ -148,7 +146,6 @@ private void cargarCategorias() {
     }
 }
 
-// Método para controlar si el spinner está habilitado
 private void controlarSpinnerGraduacion() {
     CategoriaItem categoria = (CategoriaItem) combCategoria.getSelectedItem();
     if (categoria != null && categoria.getNombre().toLowerCase().contains("graduado")) {
@@ -165,7 +162,6 @@ private boolean validarCamposObligatorios() {
     StringBuilder errores = new StringBuilder();
     boolean hayErrores = false;
     
-    // Resetear colores de fondo
     txtNombre.setBackground(Color.WHITE);
     txtDireccion.setBackground(Color.WHITE);
     combCategoria.setBackground(Color.WHITE);
@@ -174,7 +170,6 @@ private boolean validarCamposObligatorios() {
     comboCorporacion.setBackground(Color.WHITE);
     txtIdDonador.setBackground(Color.WHITE);
 
-    // 1. Validar ID generado
     String idDonador = txtIdDonador.getText().trim();
     if (idDonador.isEmpty() || idDonador.contains("Presiona") || idDonador.contains("DON")) {
         errores.append("• Debe generar el ID del donador primero\n");
@@ -182,7 +177,7 @@ private boolean validarCamposObligatorios() {
         hayErrores = true;
     }
 
-    // 2. Validar nombre (obligatorio)
+
     String nombre = txtNombre.getText().trim();
     if (nombre.isEmpty()) {
         errores.append("• El nombre es obligatorio\n");
@@ -190,7 +185,7 @@ private boolean validarCamposObligatorios() {
         hayErrores = true;
     }
 
-    // 3. Validar dirección (obligatorio)
+
     String direccion = txtDireccion.getText().trim();
     if (direccion.isEmpty()) {
         errores.append("• La dirección es obligatoria\n");
@@ -198,13 +193,13 @@ private boolean validarCamposObligatorios() {
         hayErrores = true;
     }
 
-    // 4. Validar categoría (obligatorio)
+
     if (combCategoria.getSelectedIndex() <= 0) {
         errores.append("• Debe seleccionar una categoría\n");
         combCategoria.setBackground(new Color(255, 200, 200));
         hayErrores = true;
     } else {
-        // Validar año de graduación si es Alumno
+
         CategoriaItem categoria = (CategoriaItem) combCategoria.getSelectedItem();
         if (categoria.getNombre().toLowerCase().contains("alumno")) {
             int año = (Integer) spinnerAñoGraduacion.getValue();
@@ -216,14 +211,14 @@ private boolean validarCamposObligatorios() {
         }
     }
 
-    // 5. Validar teléfono (obligatorio)
+
     String telefono = txtTelefono.getText().trim();
     if (telefono.isEmpty() || telefono.equals("(  )    -")) {
         errores.append("• El teléfono es obligatorio\n");
         txtTelefono.setBackground(new Color(255, 200, 200));
         hayErrores = true;
     } else {
-        // Validar formato mínimo de teléfono (al menos 8 dígitos)
+
         String soloNumeros = telefono.replaceAll("[^0-9]", "");
         if (soloNumeros.length() < 8) {
             errores.append("• Teléfono debe tener al menos 8 dígitos\n");
@@ -232,7 +227,7 @@ private boolean validarCamposObligatorios() {
         }
     }
 
-    // 6. Validar email (opcional pero con formato si se ingresa)
+
     String email = txtCorreo.getText().trim();
     if (!email.isEmpty()) {
         if (!email.contains("@") || !email.contains(".") || email.length() < 5) {
@@ -242,14 +237,14 @@ private boolean validarCamposObligatorios() {
         }
     }
 
-    // 7. Validar corporación (obligatoria según tu requerimiento)
+
     if (comboCorporacion.getSelectedIndex() <= 0) {
         errores.append("• Debe seleccionar una corporación\n");
         comboCorporacion.setBackground(new Color(255, 200, 200));
         hayErrores = true;
     }
 
-    // Mostrar errores si los hay
+
     if (hayErrores) {
         JOptionPane.showMessageDialog(this, 
             "Por favor complete los siguientes campos:\n\n" + errores.toString(), 
@@ -261,7 +256,7 @@ private boolean validarCamposObligatorios() {
     return true;
 }
 
-    // Carga las corporaciones (aquí solo limpia el TextField, podrías cambiar a combo)
+ 
     private void cargarCorporaciones() {
     String sql = "SELECT idCorporacion, nombre FROM Corporacion ORDER BY nombre";
 
@@ -289,7 +284,7 @@ private boolean validarCamposObligatorios() {
 
     // Carga la tabla de donadores
 private void cargarTabla() {
-    // Usa LEFT JOIN para mostrar incluso si hay valores NULL
+
     String sql = """
         SELECT 
             D.idDonador,
@@ -311,7 +306,7 @@ private void cargarTabla() {
          PreparedStatement ps = con.prepareStatement(sql);
          ResultSet rs = ps.executeQuery()) {
 
-        // Modelo con más columnas para tener toda la información
+
         javax.swing.table.DefaultTableModel modelo = 
             new javax.swing.table.DefaultTableModel(
                 new Object[]{"ID", "Nombre", "Teléfono", "Email", "Dirección", "Categoría", "Corporación"}, 0) {
@@ -336,7 +331,7 @@ private void cargarTabla() {
 
         tablaListaDonadores.setModel(modelo);
         
-        // Ajustar anchos de columnas
+
         if (tablaListaDonadores.getColumnCount() >= 7) {
             tablaListaDonadores.getColumnModel().getColumn(0).setPreferredWidth(80);   // ID
             tablaListaDonadores.getColumnModel().getColumn(1).setPreferredWidth(150);  // Nombre
@@ -363,8 +358,7 @@ private void cargarTabla() {
             .replaceAll("[ÍÌÏÎ]", "I")
             .replaceAll("[ÓÒÖÔ]", "O")
             .replaceAll("[ÚÙÜÛ]", "U")
-            .replaceAll("[^A-Z\\s]", " "); // quita números y símbolos
-
+            .replaceAll("[^A-Z\\s]", " ");
         String[] partes = limpio.split("\\s+");
         String iniciales = "DON";
 
@@ -376,10 +370,10 @@ private void cargarTabla() {
             iniciales = partes[0].substring(0, 3);
         }
 
-        String año = String.format("%02d", java.time.Year.now().getValue() % 100); // 25
-        String prefijo = iniciales + año; // ej: JCP25
+        String año = String.format("%02d", java.time.Year.now().getValue() % 100);
+        String prefijo = iniciales + año;
 
-        // QUERY 100% COMPATIBLE CON SQL SERVER
+    
         String sql = """
             SELECT ISNULL(MAX(CAST(RIGHT(idDonador, 3) AS INT)), 0) + 1 AS siguiente
             FROM Donador
@@ -405,37 +399,36 @@ private void cargarTabla() {
         }
     }
      
-    // Agregar un donador a la base de datos
+
   private void agregarDonador() {
-    // Validar antes de insertar
+
     if (!validarCamposObligatorios()) {
         return;
     }
 
     try {
-        // Obtener valores de los campos
+
         String idDonador = txtIdDonador.getText().trim();
         String nombre = txtNombre.getText().trim();
         String direccion = txtDireccion.getText().trim();
         CategoriaItem categoria = (CategoriaItem) combCategoria.getSelectedItem();
-        
-        // Manejar año de graduación
+
         int añoGraduacion;
         if (categoria.getNombre().toLowerCase().contains("alumno")) {
             añoGraduacion = (Integer) spinnerAñoGraduacion.getValue();
         } else {
-            añoGraduacion = 0; // O NULL según tu base de datos
+            añoGraduacion = 0;
         }
         
-        // Limpiar formato del teléfono
+
         String telefono = txtTelefono.getText().trim().replaceAll("[^0-9]", "");
         String email = txtCorreo.getText().trim();
         String conyuge = txtConyuge.getText().trim();
         
-        // Obtener ID de corporación
+
         CorporacionItem corporacion = (CorporacionItem) comboCorporacion.getSelectedItem();
         
-        // Preparar SQL
+
         String sql = """
             INSERT INTO Donador 
             (idDonador, nombre, direccion, idCategoria, anioGraduacion, 
@@ -451,7 +444,7 @@ private void cargarTabla() {
             ps.setString(3, direccion);
             ps.setInt(4, categoria.getId());
             
-            // Manejar año de graduación (puede ser NULL si no es alumno)
+
             if (añoGraduacion > 0) {
                 ps.setInt(5, añoGraduacion);
             } else {
@@ -474,7 +467,6 @@ private void cargarTabla() {
                     "Registro exitoso", 
                     JOptionPane.INFORMATION_MESSAGE);
                 
-                // Actualizar y limpiar
                 cargarTabla();
                 limpiarCampos();
                 txtIdDonador.setText("Presiona Generar ID");
@@ -491,7 +483,6 @@ private void cargarTabla() {
     }
 }
 
-  // Método para eliminar donador
 private void eliminarDonador() {
     int fila = tablaListaDonadores.getSelectedRow();
     if (fila == -1) {
@@ -530,7 +521,7 @@ private void eliminarDonador() {
                     "Eliminación exitosa", 
                     JOptionPane.INFORMATION_MESSAGE);
                 
-                // Actualizar la tabla
+
                 cargarTabla();
                 limpiarCampos();
                 
@@ -549,7 +540,7 @@ private void eliminarDonador() {
     }
 }
 
-// Verificar si tiene donativos asociados
+
 private boolean tieneDonativosAsociados(String idDonador) {
     String sql = "SELECT COUNT(*) FROM Donativo WHERE idDonador = ?";
     
@@ -570,7 +561,7 @@ private boolean tieneDonativosAsociados(String idDonador) {
     return false;
 }
 
-// Verificar si tiene pagos asociados
+
 private boolean tienePagosAsociados(String idDonador) {
     String sql = "SELECT COUNT(*) FROM Pago WHERE idDonador = ?";
     
@@ -623,7 +614,7 @@ private void buscarDonador(String criterio) {
         ResultSet rs = ps.executeQuery();
         
         if (rs.next()) {
-            // Llenar campos del formulario
+
             cargarDatosEnFormulario(rs);
             
             JOptionPane.showMessageDialog(this, 
@@ -632,7 +623,7 @@ private void buscarDonador(String criterio) {
                 "Búsqueda exitosa", 
                 JOptionPane.INFORMATION_MESSAGE);
             
-            // Cambiar estado de botones
+
             botonAgregar.setEnabled(false);
             botonEditar.setEnabled(true);
             
@@ -652,7 +643,7 @@ private void buscarDonador(String criterio) {
 }
 
 private void cargarDatosEnFormulario(ResultSet rs) throws SQLException {
-    // Cargar datos básicos
+
     txtIdDonador.setText(rs.getString("idDonador"));
     txtNombre.setText(rs.getString("nombre"));
     txtDireccion.setText(rs.getString("direccion"));
@@ -660,23 +651,22 @@ private void cargarDatosEnFormulario(ResultSet rs) throws SQLException {
     txtCorreo.setText(rs.getString("email"));
     txtConyuge.setText(rs.getString("conyuge"));
     
-    // Cargar año de graduación
+
     int año = rs.getInt("anioGraduacion");
     if (!rs.wasNull()) {
         spinnerAñoGraduacion.setValue(año);
     }
     
-    // Seleccionar categoría en ComboBox
+
     int idCategoria = rs.getInt("idCategoria");
     seleccionarItemEnComboBox(combCategoria, idCategoria);
     
     // Seleccionar corporación en ComboBox
     int idCorporacion = rs.getInt("idCorporacion");
     seleccionarItemEnComboBox(comboCorporacion, idCorporacion);
-    
-    // Cambiar color del ID para indicar que es existente
-    txtIdDonador.setForeground(new Color(0, 100, 0)); // Verde oscuro
-    txtIdDonador.setBackground(new Color(220, 255, 220)); // Verde claro
+
+    txtIdDonador.setForeground(new Color(0, 100, 0)); 
+    txtIdDonador.setBackground(new Color(220, 255, 220));
 }
 
 private void seleccionarItemEnComboBox(javax.swing.JComboBox comboBox, int id) {
@@ -699,7 +689,7 @@ private void seleccionarItemEnComboBox(javax.swing.JComboBox comboBox, int id) {
 }
 
 private void editarDonador() {
-    // Validar que haya un ID cargado (de una búsqueda previa)
+
     String idDonador = txtIdDonador.getText().trim();
     if (idDonador.isEmpty() || idDonador.contains("Presiona") || idDonador.contains("DON")) {
         JOptionPane.showMessageDialog(this, 
@@ -714,7 +704,7 @@ private void editarDonador() {
         return;
     }
     
-    // Confirmar edición
+
     int confirmacion = JOptionPane.showConfirmDialog(this,
         "¿Está seguro de actualizar los datos del donador?\n\n" +
         "ID: " + idDonador + "\n" +
@@ -744,7 +734,7 @@ private void actualizarDonadorEnBD(String idDonador) {
     try (Connection con = ConexionBD.getConexion();
          PreparedStatement ps = con.prepareStatement(sql)) {
         
-        // Obtener valores del formulario
+
         String nombre = txtNombre.getText().trim();
         String direccion = txtDireccion.getText().trim();
         CategoriaItem categoria = (CategoriaItem) combCategoria.getSelectedItem();
@@ -754,12 +744,12 @@ private void actualizarDonadorEnBD(String idDonador) {
         String conyuge = txtConyuge.getText().trim();
         CorporacionItem corporacion = (CorporacionItem) comboCorporacion.getSelectedItem();
         
-        // Establecer parámetros
+
         ps.setString(1, nombre);
         ps.setString(2, direccion);
         ps.setInt(3, categoria.getId());
         
-        // Manejar año de graduación (NULL si no aplica)
+
         if (añoGraduacion > 0) {
             ps.setInt(4, añoGraduacion);
         } else {
@@ -769,7 +759,7 @@ private void actualizarDonadorEnBD(String idDonador) {
         ps.setString(5, telefono);
         ps.setString(6, email.isEmpty() ? null : email);
         
-        // Manejar corporación (debe existir)
+
         if (corporacion != null && corporacion.getId() > 0) {
             ps.setInt(7, corporacion.getId());
         } else {
@@ -791,7 +781,7 @@ private void actualizarDonadorEnBD(String idDonador) {
             cargarTabla();
             limpiarCampos();
             
-            // Restaurar estado de botones
+
             botonAgregar.setEnabled(true);
             botonEditar.setEnabled(false);
             
@@ -845,14 +835,14 @@ private void limpiarCampos() {
     
     txtConyuge.setText("");
     
-    // Restaurar estado de botones
+
     botonAgregar.setEnabled(true);
     botonEditar.setEnabled(false);
     
-    // Deseleccionar tabla
+
     tablaListaDonadores.clearSelection();
     
-    // Enfocar campo nombre
+
     txtNombre.requestFocus();
 }
     /**
@@ -1041,26 +1031,13 @@ private void limpiarCampos() {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel9)
-                            .addComponent(jLabel10))
-                        .addGap(38, 38, 38)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtConyuge, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(comboCorporacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(6, 6, 6)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(botonVolver))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel12)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(botonLimpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(botonVolver))
-                            .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel1)
                                     .addComponent(jLabel3)
@@ -1077,23 +1054,40 @@ private void limpiarCampos() {
                                                 .addGap(38, 38, 38)
                                                 .addComponent(botonGenerarId))
                                             .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 61, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(botonAgregar)
-                                    .addComponent(botonEliminar, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(botonBuscar, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(botonEditar, javax.swing.GroupLayout.Alignment.LEADING))))
-                        .addGap(16, 16, 16))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel11)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel7)
-                                .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(spinnerAñoGraduacion, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                    .addComponent(jLabel10)
+                                    .addComponent(jLabel11)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel7)
+                                        .addGap(18, 18, 18)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(txtTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(spinnerAñoGraduacion, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel9)
+                                        .addGap(70, 70, 70)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(txtConyuge, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(comboCorporacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(jLabel12))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(2, 2, 2)
+                                        .addComponent(botonLimpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(botonAgregar)))
+                                .addComponent(botonEliminar, javax.swing.GroupLayout.Alignment.TRAILING))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(botonEditar)
+                                .addComponent(botonBuscar)))
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1122,7 +1116,7 @@ private void limpiarCampos() {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addComponent(botonEliminar)
-                        .addGap(15, 15, 15)
+                        .addGap(18, 18, 18)
                         .addComponent(botonBuscar)))
                 .addGap(13, 13, 13)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -1130,33 +1124,34 @@ private void limpiarCampos() {
                     .addComponent(spinnerAñoGraduacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(botonEditar))
                 .addGap(24, 24, 24)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel8)
+                    .addComponent(txtTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(15, 15, 15)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(comboCorporacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel10))
+                        .addGap(35, 35, 35))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(botonLimpiar)
+                        .addGap(16, 16, 16)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel8)
-                            .addComponent(txtTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(15, 15, 15)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel9)
-                            .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(34, 34, 34)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel10)
-                            .addComponent(comboCorporacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel11)
                             .addComponent(txtConyuge, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(44, 44, 44)
-                                .addComponent(jLabel12))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(botonLimpiar)
-                                .addGap(30, 30, 30)))
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(botonVolver)))
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel12)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(botonVolver))
+                .addContainerGap())
         );
 
         pack();
