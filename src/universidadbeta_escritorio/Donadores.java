@@ -48,10 +48,10 @@ private void configurarspinnerAñoGraduacion() {
      int añoActual = java.time.Year.now().getValue();
     
     javax.swing.SpinnerNumberModel model = new javax.swing.SpinnerNumberModel(
-        añoActual,          // Valor inicial
-        1990,               // Mínimo
-        añoActual,          // Máximo
-        1                   // Incremento
+        añoActual,          
+        1990,               
+        añoActual,          
+        1                   
     );
     
     model.setValue(Integer.valueOf(añoActual));
@@ -132,8 +132,6 @@ private void cargarCategorias() {
             String nombre = rs.getString("nombre");
             combCategoria.addItem(new CategoriaItem(id, nombre));
         }
-
-        // Agregar listener para controlar el spinner de año
         combCategoria.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 controlarSpinnerGraduacion();
@@ -395,7 +393,7 @@ private void cargarTabla() {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            return prefijo + "-001"; // por si falla la conexión
+            return prefijo + "-001";
         }
     }
      
@@ -460,7 +458,7 @@ private void cargarTabla() {
             
             if (filasAfectadas > 0) {
                 JOptionPane.showMessageDialog(this, 
-                    "✅ Donador registrado exitosamente!\n\n" +
+                    "Donador registrado exitosamente!\n\n" +
                     "ID: " + idDonador + "\n" +
                     "Nombre: " + nombre + "\n" +
                     "Categoría: " + categoria.getNombre(), 
@@ -476,7 +474,7 @@ private void cargarTabla() {
         
     } catch (SQLException e) {
         JOptionPane.showMessageDialog(this, 
-            "❌ Error al guardar en la base de datos:\n" + e.getMessage(), 
+            "Error al guardar en la base de datos:\n" + e.getMessage(), 
             "Error de base de datos", 
             JOptionPane.ERROR_MESSAGE);
         e.printStackTrace();
@@ -501,7 +499,7 @@ private void eliminarDonador() {
         "¿Está seguro de eliminar al donador?\n\n" +
         "ID: " + idDonador + "\n" +
         "Nombre: " + nombre + "\n\n" +
-        "⚠️ Advertencia: Esta acción no se puede deshacer.",
+        "Advertencia: Esta acción no se puede deshacer.",
         "Confirmar eliminación", 
         JOptionPane.YES_NO_OPTION, 
         JOptionPane.WARNING_MESSAGE);
@@ -517,7 +515,7 @@ private void eliminarDonador() {
             
             if (filasAfectadas > 0) {
                 JOptionPane.showMessageDialog(this, 
-                    "✅ Donador eliminado exitosamente",
+                    "Donador eliminado exitosamente",
                     "Eliminación exitosa", 
                     JOptionPane.INFORMATION_MESSAGE);
                 
@@ -532,7 +530,7 @@ private void eliminarDonador() {
             
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, 
-                "❌ Error al eliminar: " + e.getMessage(),
+                "Error al eliminar: " + e.getMessage(),
                 "Error de base de datos", 
                 JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
@@ -618,7 +616,7 @@ private void buscarDonador(String criterio) {
             cargarDatosEnFormulario(rs);
             
             JOptionPane.showMessageDialog(this, 
-                "✅ Donador encontrado\n\nID: " + rs.getString("idDonador") + 
+                "Donador encontrado\n\nID: " + rs.getString("idDonador") + 
                 "\nNombre: " + rs.getString("nombre"),
                 "Búsqueda exitosa", 
                 JOptionPane.INFORMATION_MESSAGE);
@@ -661,7 +659,6 @@ private void cargarDatosEnFormulario(ResultSet rs) throws SQLException {
     int idCategoria = rs.getInt("idCategoria");
     seleccionarItemEnComboBox(combCategoria, idCategoria);
     
-    // Seleccionar corporación en ComboBox
     int idCorporacion = rs.getInt("idCorporacion");
     seleccionarItemEnComboBox(comboCorporacion, idCorporacion);
 
@@ -699,7 +696,6 @@ private void editarDonador() {
         return;
     }
     
-    // Validar campos obligatorios
     if (!validarCamposObligatorios()) {
         return;
     }
@@ -773,11 +769,11 @@ private void actualizarDonadorEnBD(String idDonador) {
         
         if (filasAfectadas > 0) {
             JOptionPane.showMessageDialog(this, 
-                "✅ Donador actualizado exitosamente",
+                "Donador actualizado exitosamente",
                 "Actualización exitosa", 
                 JOptionPane.INFORMATION_MESSAGE);
             
-            // Actualizar tabla y limpiar
+
             cargarTabla();
             limpiarCampos();
             
@@ -794,7 +790,7 @@ private void actualizarDonadorEnBD(String idDonador) {
         
     } catch (SQLException e) {
         JOptionPane.showMessageDialog(this, 
-            "❌ Error al actualizar: " + e.getMessage(),
+            "Error al actualizar: " + e.getMessage(),
             "Error de base de datos", 
             JOptionPane.ERROR_MESSAGE);
         e.printStackTrace();
@@ -1009,6 +1005,12 @@ private void limpiarCampos() {
             }
         });
 
+        comboCorporacion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboCorporacionActionPerformed(evt);
+            }
+        });
+
         tablaListaDonadores.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -1037,43 +1039,38 @@ private void limpiarCampos() {
                         .addComponent(botonVolver))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel1)
-                                    .addComponent(jLabel3)
-                                    .addComponent(jLabel8)
-                                    .addComponent(jLabel14)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel6)
-                                        .addGap(50, 50, 50)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(txtDireccion, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(combCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addGroup(layout.createSequentialGroup()
-                                                .addComponent(txtIdDonador, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(38, 38, 38)
-                                                .addComponent(botonGenerarId))
-                                            .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel1)
+                                .addComponent(jLabel3)
+                                .addComponent(jLabel8)
+                                .addComponent(jLabel14)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(jLabel6)
+                                    .addGap(50, 50, 50)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(txtDireccion, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(combCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(layout.createSequentialGroup()
+                                            .addComponent(txtIdDonador, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addGap(38, 38, 38)
+                                            .addComponent(botonGenerarId))
+                                        .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(jLabel10)
+                            .addComponent(jLabel11)
                             .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel7)
+                                .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel10)
-                                    .addComponent(jLabel11)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel7)
-                                        .addGap(18, 18, 18)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(txtTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(spinnerAñoGraduacion, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel9)
-                                        .addGap(70, 70, 70)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(txtConyuge, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(comboCorporacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                    .addComponent(jLabel12))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                    .addComponent(txtTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(spinnerAñoGraduacion, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel9)
+                                .addGap(70, 70, 70)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtConyuge, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(comboCorporacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jLabel12))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1223,6 +1220,10 @@ private void limpiarCampos() {
     private void botonLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonLimpiarActionPerformed
        limpiarCampos();
     }//GEN-LAST:event_botonLimpiarActionPerformed
+
+    private void comboCorporacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboCorporacionActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_comboCorporacionActionPerformed
 
     /**
      * @param args the command line arguments
