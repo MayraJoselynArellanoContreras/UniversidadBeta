@@ -33,27 +33,23 @@ public class Corporacion extends javax.swing.JFrame {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 if (evt.getClickCount() == 2) {
-                    cargarParaEditar();
                 }
             }
         });
     }
     
     cargarTabla();
-    botonEditar.setEnabled(false);
 }    
     
 private void agregarCorporacion() {
-    // Validar campos obligatorios
     if (!validarCampos()) {
         return;
     }
-    
-    // Obtener valores
+  
     String nombre = txtNombreCorporacion.getText().trim();
     String direccion = txtDireccion.getText().trim();
     
-    // SQL - SOLO nombre y direccion (el ID lo genera SQL Server automáticamente)
+ 
     String sql = "INSERT INTO Corporacion (nombre, direccion) VALUES (?, ?)";
     
     try (Connection con = ConexionBD.getConexion();
@@ -65,12 +61,11 @@ private void agregarCorporacion() {
         int filasAfectadas = ps.executeUpdate();
         
         if (filasAfectadas > 0) {
-            // Obtener el ID generado automáticamente por SQL Server
+
             try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    int idGenerado = generatedKeys.getInt(1); // Esto obtiene el IDENTITY value
+                    int idGenerado = generatedKeys.getInt(1); 
                     
-                    // Mostrar el ID en el campo correspondiente
                     txtIdCorporacion.setText(String.valueOf(idGenerado));
                     
                     JOptionPane.showMessageDialog(this,
@@ -95,10 +90,10 @@ private void agregarCorporacion() {
         }
         
     } catch (SQLException e) {
-        // Mostrar error detallado
+
         String mensajeError = "Error al crear corporación: " + e.getMessage();
         
-        // Si es error de duplicado
+
         if (e.getMessage().contains("PRIMARY KEY") || e.getMessage().contains("duplicate")) {
             mensajeError = "Error: Ya existe una corporación con ese nombre";
         }
@@ -118,7 +113,7 @@ private void cargarTabla() {
          PreparedStatement ps = con.prepareStatement(sql);
          ResultSet rs = ps.executeQuery()) {
         
-        // Crear modelo de tabla no editable
+
         javax.swing.table.DefaultTableModel modelo = 
             new javax.swing.table.DefaultTableModel(
                 new Object[]{"ID", "Nombre", "Dirección"}, 0) {
@@ -132,23 +127,23 @@ private void cargarTabla() {
         // Llenar la tabla con los datos
         while (rs.next()) {
             modelo.addRow(new Object[]{
-                rs.getInt("idCorporacion"),  // ← Entero, no String
+                rs.getInt("idCorporacion"),  
                 rs.getString("nombre"),
                 rs.getString("direccion")
             });
         }
         
-        // Aplicar el modelo a la tabla
+
         tablaCorporaciones.setModel(modelo);
         
-        // Configurar anchos de columnas
+
         if (tablaCorporaciones.getColumnCount() >= 3) {
-            tablaCorporaciones.getColumnModel().getColumn(0).setPreferredWidth(60);  // ID
-            tablaCorporaciones.getColumnModel().getColumn(1).setPreferredWidth(150); // Nombre
-            tablaCorporaciones.getColumnModel().getColumn(2).setPreferredWidth(200); // Dirección
+            tablaCorporaciones.getColumnModel().getColumn(0).setPreferredWidth(60);  
+            tablaCorporaciones.getColumnModel().getColumn(1).setPreferredWidth(150); 
+            tablaCorporaciones.getColumnModel().getColumn(2).setPreferredWidth(200); 
         }
         
-        // Deshabilitar edición directa
+
         tablaCorporaciones.setDefaultEditor(Object.class, null);
         
     } catch (SQLException e) {
@@ -221,107 +216,6 @@ private void buscarCorporacion() {
     }
 }
 
-private void cargarParaEditar() {
-    int fila = tablaCorporaciones.getSelectedRow();
-    if (fila == -1) {
-        JOptionPane.showMessageDialog(this,
-            "Seleccione una corporación de la tabla para editar",
-            "Selección requerida",
-            JOptionPane.WARNING_MESSAGE);
-        return;
-    }
-    
-    // Obtener datos de la fila seleccionada
-    int id = (Integer) tablaCorporaciones.getValueAt(fila, 0);
-    String nombre = (String) tablaCorporaciones.getValueAt(fila, 1);
-    String direccion = (String) tablaCorporaciones.getValueAt(fila, 2);
-    
-    // Cargar en los campos del formulario
-    txtIdCorporacion.setText(String.valueOf(id));
-    txtNombreCorporacion.setText(nombre);
-    txtDireccion.setText(direccion);
-    
-    // Cambiar estado de botones
-    botonAgregar.setEnabled(false);
-    botonEditar.setEnabled(true);
-    
-    JOptionPane.showMessageDialog(this,
-        "Datos cargados para edición.\nID: " + id + "\nModifique los campos y haga clic en 'Editar'.",
-        "Modo edición",
-        JOptionPane.INFORMATION_MESSAGE);
-}
-
-private void editarCorporacion() {
-    // Verificar que haya un ID cargado (de una búsqueda previa o doble clic)
-    String idTexto = txtIdCorporacion.getText().trim();
-    if (idTexto.isEmpty()) {
-        JOptionPane.showMessageDialog(this,
-            "Primero cargue una corporación para editar",
-            "Advertencia",
-            JOptionPane.WARNING_MESSAGE);
-        return;
-    }
-    
-    if (!validarCampos()) {
-        return;
-    }
-    
-    int id = Integer.parseInt(idTexto);
-    String nombre = txtNombreCorporacion.getText().trim();
-    String direccion = txtDireccion.getText().trim();
-    
-    // Confirmar actualización
-    int confirmacion = JOptionPane.showConfirmDialog(this,
-        "¿Está seguro de actualizar la corporación?\n\n" +
-        "ID: " + id + "\n" +
-        "Nuevo nombre: " + nombre + "\n" +
-        "Nueva dirección: " + direccion,
-        "Confirmar actualización",
-        JOptionPane.YES_NO_OPTION,
-        JOptionPane.QUESTION_MESSAGE);
-    
-    if (confirmacion != JOptionPane.YES_OPTION) {
-        return;
-    }
-    
-    // SQL de actualización
-    String sql = "UPDATE Corporacion SET nombre = ?, direccion = ? WHERE idCorporacion = ?";
-    
-    try (Connection con = ConexionBD.getConexion();
-         PreparedStatement ps = con.prepareStatement(sql)) {
-        
-        ps.setString(1, nombre);
-        ps.setString(2, direccion);
-        ps.setInt(3, id);
-        
-        int filasAfectadas = ps.executeUpdate();
-        
-        if (filasAfectadas > 0) {
-            JOptionPane.showMessageDialog(this,
-                "✅ Corporación actualizada exitosamente",
-                "Actualización exitosa",
-                JOptionPane.INFORMATION_MESSAGE);
-            
-            cargarTabla();
-            limpiarCampos();
-            botonAgregar.setEnabled(true);
-            botonEditar.setEnabled(false);
-        } else {
-            JOptionPane.showMessageDialog(this,
-                "No se pudo actualizar la corporación",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-        }
-        
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this,
-            "Error al actualizar: " + e.getMessage(),
-            "Error de base de datos",
-            JOptionPane.ERROR_MESSAGE);
-        e.printStackTrace();
-    }
-}
-
 private boolean tieneDonadoresAsociados(int idCorporacion) {
     String sql = "SELECT COUNT(*) FROM Donador WHERE idCorporacion = ?";
     
@@ -343,19 +237,19 @@ private boolean tieneDonadoresAsociados(int idCorporacion) {
 }
 
 private boolean validarCampos() {
-    // Resetear colores de fondo a blanco
+
     txtNombreCorporacion.setBackground(Color.WHITE);
     txtDireccion.setBackground(Color.WHITE);
     
-    // StringBuilder para acumular mensajes de error
+
     StringBuilder errores = new StringBuilder();
     boolean hayErrores = false;
     
-    // 1. Validar NOMBRE
+
     String nombre = txtNombreCorporacion.getText().trim();
     if (nombre.isEmpty()) {
         errores.append("• El nombre de la corporación es obligatorio\n");
-        txtNombreCorporacion.setBackground(new Color(255, 200, 200)); // Rojo claro
+        txtNombreCorporacion.setBackground(new Color(255, 200, 200)); 
         hayErrores = true;
     } else if (nombre.length() < 3) {
         errores.append("• El nombre debe tener al menos 3 caracteres\n");
@@ -367,7 +261,7 @@ private boolean validarCampos() {
         hayErrores = true;
     }
     
-    // 2. Validar DIRECCIÓN
+
     String direccion = txtDireccion.getText().trim();
     if (direccion.isEmpty()) {
         errores.append("• La dirección es obligatoria\n");
@@ -383,7 +277,7 @@ private boolean validarCampos() {
         hayErrores = true;
     }
     
-    // 3. Si hay errores, mostrarlos y retornar false
+
     if (hayErrores) {
         String titulo = "Errores de validación";
         String mensaje = "Por favor corrija los siguientes errores:\n\n" + errores.toString();
@@ -393,7 +287,7 @@ private boolean validarCampos() {
             titulo, 
             JOptionPane.WARNING_MESSAGE);
         
-        // Enfocar el primer campo con error
+
         if (txtNombreCorporacion.getBackground().equals(new Color(255, 200, 200))) {
             txtNombreCorporacion.requestFocus();
         } else if (txtDireccion.getBackground().equals(new Color(255, 200, 200))) {
@@ -416,7 +310,6 @@ private void limpiarCampos() {
     
     // Restaurar estado de botones
     botonAgregar.setEnabled(true);
-    botonEditar.setEnabled(false);
     
     // Deseleccionar tabla
     if (tablaCorporaciones != null) {
@@ -427,7 +320,7 @@ private void limpiarCampos() {
     txtNombreCorporacion.requestFocus();
 }
 
-// Llamar este método después de eliminar
+
 private void eliminarCorporacion() {
     int fila = tablaCorporaciones.getSelectedRow();
     if (fila == -1) {
@@ -441,7 +334,7 @@ private void eliminarCorporacion() {
     int id = (Integer) tablaCorporaciones.getValueAt(fila, 0);
     String nombre = (String) tablaCorporaciones.getValueAt(fila, 1);
     
-    // Confirmar eliminación
+
     int confirmacion = JOptionPane.showConfirmDialog(this,
         "¿Está seguro de eliminar la corporación?\n\n" +
         "ID: " + id + "\n" +
@@ -452,7 +345,7 @@ private void eliminarCorporacion() {
         JOptionPane.WARNING_MESSAGE);
     
     if (confirmacion == JOptionPane.YES_OPTION) {
-        // Primero verificar si hay donadores asociados
+
         if (tieneDonadoresAsociados(id)) {
             JOptionPane.showMessageDialog(this,
                 "No se puede eliminar. Esta corporación tiene donadores asociados.\n" +
@@ -479,7 +372,6 @@ private void eliminarCorporacion() {
                 cargarTabla();
                 limpiarCampos();
                 botonAgregar.setEnabled(true);
-                botonEditar.setEnabled(false);
             }
             
         } catch (SQLException e) {
@@ -508,8 +400,6 @@ private void eliminarCorporacion() {
         jLabel4 = new javax.swing.JLabel();
         botonAgregar = new javax.swing.JButton();
         botonEliminar = new javax.swing.JButton();
-        botonBuscar = new javax.swing.JButton();
-        botonEditar = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tablaCorporaciones = new javax.swing.JTable();
@@ -562,22 +452,6 @@ private void eliminarCorporacion() {
         botonEliminar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 botonEliminarActionPerformed(evt);
-            }
-        });
-
-        botonBuscar.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\search-alt.png")); // NOI18N
-        botonBuscar.setText("Buscar");
-        botonBuscar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botonBuscarActionPerformed(evt);
-            }
-        });
-
-        botonEditar.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\edit.png")); // NOI18N
-        botonEditar.setText("Editar");
-        botonEditar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botonEditarActionPerformed(evt);
             }
         });
 
@@ -642,15 +516,10 @@ private void eliminarCorporacion() {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(197, 197, 197)
                         .addComponent(botonLimpiar)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 48, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(botonEditar)
-                        .addComponent(botonAgregar)
-                        .addComponent(botonEliminar))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(botonBuscar)
-                        .addGap(13, 13, 13)))
+                    .addComponent(botonAgregar)
+                    .addComponent(botonEliminar))
                 .addGap(15, 15, 15))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
@@ -674,21 +543,15 @@ private void eliminarCorporacion() {
                     .addComponent(botonAgregar))
                 .addGap(20, 20, 20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(botonEliminar)
                     .addComponent(jLabel2)
                     .addComponent(txtNombreCorporacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(botonBuscar)
-                    .addComponent(txtDireccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(botonEditar))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(34, 34, 34)
-                        .addComponent(botonLimpiar)))
+                    .addComponent(txtDireccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(botonEliminar))
+                .addGap(33, 33, 33)
+                .addComponent(botonLimpiar)
                 .addGap(26, 26, 26)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
@@ -708,14 +571,6 @@ private void eliminarCorporacion() {
     private void botonEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonEliminarActionPerformed
           eliminarCorporacion();
     }//GEN-LAST:event_botonEliminarActionPerformed
-
-    private void botonBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonBuscarActionPerformed
-        buscarCorporacion();
-    }//GEN-LAST:event_botonBuscarActionPerformed
-
-    private void botonEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonEditarActionPerformed
-        editarCorporacion();
-    }//GEN-LAST:event_botonEditarActionPerformed
 
     private void botonLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonLimpiarActionPerformed
         limpiarCampos();
@@ -755,8 +610,6 @@ private void eliminarCorporacion() {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botonAgregar;
-    private javax.swing.JButton botonBuscar;
-    private javax.swing.JButton botonEditar;
     private javax.swing.JButton botonEliminar;
     private javax.swing.JButton botonLimpiar;
     private javax.swing.JButton botonVolver;
