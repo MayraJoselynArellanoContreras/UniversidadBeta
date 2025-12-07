@@ -30,21 +30,15 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        botonVerDonadores = new javax.swing.JButton();
-        jLabel3 = new javax.swing.JLabel();
-        botonVerDonativos = new javax.swing.JButton();
-        jLabel4 = new javax.swing.JLabel();
-        verPagos = new javax.swing.JButton();
-        jLabel5 = new javax.swing.JLabel();
-        verEventos = new javax.swing.JButton();
-        jLabel6 = new javax.swing.JLabel();
-        verRepresentantes = new javax.swing.JButton();
-        jLabel7 = new javax.swing.JLabel();
-        verReportes = new javax.swing.JButton();
         botonCerrarSesion = new javax.swing.JButton();
-        jLabel8 = new javax.swing.JLabel();
-        botonCorporaciones = new javax.swing.JButton();
+        jLabel9 = new javax.swing.JLabel();
+        botonGestion = new javax.swing.JButton();
+        jLabel10 = new javax.swing.JLabel();
+        botonEventos = new javax.swing.JButton();
+        jLabel11 = new javax.swing.JLabel();
+        botonGestionPagos = new javax.swing.JButton();
+        jLabel12 = new javax.swing.JLabel();
+        botonConfig = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 204));
@@ -58,91 +52,18 @@ public class MenuPrincipal extends javax.swing.JFrame {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(146, 146, 146)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(184, 184, 184))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(18, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(jLabel1)
-                .addGap(14, 14, 14))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
-
-        jLabel2.setBackground(new java.awt.Color(153, 204, 255));
-        jLabel2.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\handshake.png")); // NOI18N
-        jLabel2.setText("Donadores");
-
-        botonVerDonadores.setBackground(new java.awt.Color(204, 204, 0));
-        botonVerDonadores.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-up-right.png")); // NOI18N
-        botonVerDonadores.setText("Entrar");
-        botonVerDonadores.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botonVerDonadoresActionPerformed(evt);
-            }
-        });
-
-        jLabel3.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\coins.png")); // NOI18N
-        jLabel3.setText("Donativos");
-
-        botonVerDonativos.setBackground(new java.awt.Color(0, 204, 204));
-        botonVerDonativos.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-up-right.png")); // NOI18N
-        botonVerDonativos.setText("Entrar");
-        botonVerDonativos.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botonVerDonativosActionPerformed(evt);
-            }
-        });
-
-        jLabel4.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\calendar-clock.png")); // NOI18N
-        jLabel4.setText("Pagos");
-
-        verPagos.setBackground(new java.awt.Color(255, 0, 204));
-        verPagos.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-up-right.png")); // NOI18N
-        verPagos.setText("Entrar");
-        verPagos.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                verPagosActionPerformed(evt);
-            }
-        });
-
-        jLabel5.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\calendar-lines-pen.png")); // NOI18N
-        jLabel5.setText("Eventos");
-
-        verEventos.setBackground(new java.awt.Color(0, 153, 204));
-        verEventos.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-up-right.png")); // NOI18N
-        verEventos.setText("Entrar");
-        verEventos.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                verEventosActionPerformed(evt);
-            }
-        });
-
-        jLabel6.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\people-poll.png")); // NOI18N
-        jLabel6.setText("Representantes");
-
-        verRepresentantes.setBackground(new java.awt.Color(51, 153, 255));
-        verRepresentantes.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-up-right.png")); // NOI18N
-        verRepresentantes.setText("Entrar");
-        verRepresentantes.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                verRepresentantesActionPerformed(evt);
-            }
-        });
-
-        jLabel7.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\file-invoice.png")); // NOI18N
-        jLabel7.setText("Reportes");
-
-        verReportes.setBackground(new java.awt.Color(255, 0, 0));
-        verReportes.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-up-right.png")); // NOI18N
-        verReportes.setText("Entrar");
-        verReportes.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                verReportesActionPerformed(evt);
-            }
-        });
 
         botonCerrarSesion.setBackground(new java.awt.Color(255, 153, 0));
         botonCerrarSesion.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\exit.png")); // NOI18N
@@ -153,17 +74,47 @@ public class MenuPrincipal extends javax.swing.JFrame {
             }
         });
 
-        jLabel8.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\phone-office (1).png")); // NOI18N
-        jLabel8.setText("Corporaciones");
+        jLabel9.setFont(new java.awt.Font("Yu Gothic", 1, 12)); // NOI18N
+        jLabel9.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\hand-holding-heart.png")); // NOI18N
+        jLabel9.setText("Personas y entidades");
 
-        botonCorporaciones.setBackground(new java.awt.Color(153, 153, 153));
-        botonCorporaciones.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-up-right.png")); // NOI18N
-        botonCorporaciones.setText("Entrar");
-        botonCorporaciones.addActionListener(new java.awt.event.ActionListener() {
+        botonGestion.setBackground(new java.awt.Color(204, 204, 0));
+        botonGestion.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\angle-right.png")); // NOI18N
+        botonGestion.setText("Entrar");
+        botonGestion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botonCorporacionesActionPerformed(evt);
+                botonGestionActionPerformed(evt);
             }
         });
+
+        jLabel10.setFont(new java.awt.Font("Yu Gothic", 1, 12)); // NOI18N
+        jLabel10.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\settings-sliders.png")); // NOI18N
+        jLabel10.setText("Configuracion y reportes");
+
+        botonEventos.setBackground(new java.awt.Color(0, 153, 204));
+        botonEventos.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\angle-right.png")); // NOI18N
+        botonEventos.setText("Entrar");
+
+        jLabel11.setFont(new java.awt.Font("Yu Gothic", 1, 12)); // NOI18N
+        jLabel11.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\coins.png")); // NOI18N
+        jLabel11.setText("Donativos y pagos");
+
+        botonGestionPagos.setBackground(new java.awt.Color(0, 204, 153));
+        botonGestionPagos.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\angle-right.png")); // NOI18N
+        botonGestionPagos.setText("Entrar");
+        botonGestionPagos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonGestionPagosActionPerformed(evt);
+            }
+        });
+
+        jLabel12.setFont(new java.awt.Font("Yu Gothic", 1, 12)); // NOI18N
+        jLabel12.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\id-badge.png")); // NOI18N
+        jLabel12.setText("Eventos y comunicacion");
+
+        botonConfig.setBackground(new java.awt.Color(153, 153, 153));
+        botonConfig.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\angle-right.png")); // NOI18N
+        botonConfig.setText("Entrar");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -173,90 +124,61 @@ public class MenuPrincipal extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(botonCerrarSesion)
                 .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(23, 23, 23)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(74, 74, 74)
+                .addComponent(botonGestion)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(botonEventos)
+                .addGap(92, 92, 92))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(12, 12, 12)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel5)
-                    .addComponent(verEventos)
-                    .addComponent(botonVerDonadores))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 75, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(botonCorporaciones)
-                    .addComponent(jLabel8)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel9)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 128, Short.MAX_VALUE)
+                        .addComponent(jLabel12)
+                        .addGap(64, 64, 64))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(botonVerDonativos)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel6)
-                            .addComponent(verRepresentantes))
-                        .addGap(34, 34, 34)
+                            .addComponent(jLabel11)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(63, 63, 63)
+                                .addComponent(botonGestionPagos)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(verPagos)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel7)
-                            .addComponent(verReportes))))
-                .addGap(33, 33, 33))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(jLabel10)
+                                .addGap(61, 61, 61))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(botonConfig)
+                                .addGap(89, 89, 89))))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel4))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(botonVerDonadores)
-                    .addComponent(botonVerDonativos)
-                    .addComponent(verPagos))
-                .addGap(27, 27, 27)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel6)
-                    .addComponent(jLabel7))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(verEventos)
-                    .addComponent(verRepresentantes)
-                    .addComponent(verReportes))
                 .addGap(18, 18, 18)
-                .addComponent(jLabel8)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(jLabel12))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(botonCorporaciones)
-                .addGap(15, 15, 15)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(botonGestion)
+                    .addComponent(botonEventos))
+                .addGap(38, 38, 38)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel11)
+                    .addComponent(jLabel10))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(botonGestionPagos)
+                    .addComponent(botonConfig))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 66, Short.MAX_VALUE)
                 .addComponent(botonCerrarSesion))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void botonVerDonadoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonVerDonadoresActionPerformed
-        Donadores ventana = new Donadores();
-    ventana.setVisible(true);
-    }//GEN-LAST:event_botonVerDonadoresActionPerformed
-
-    private void verEventosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verEventosActionPerformed
-       Eventos ventana = new Eventos();
-    ventana.setVisible(true);
-    }//GEN-LAST:event_verEventosActionPerformed
-
-    private void botonVerDonativosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonVerDonativosActionPerformed
-         Donativos ventana = new Donativos();
-    ventana.setVisible(true);
-    }//GEN-LAST:event_botonVerDonativosActionPerformed
-
-    private void verPagosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verPagosActionPerformed
-        Pagos ventana = new Pagos();
-    ventana.setVisible(true);
-    }//GEN-LAST:event_verPagosActionPerformed
-
-    private void verRepresentantesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verRepresentantesActionPerformed
-        Representantes ventana = new Representantes();
-    ventana.setVisible(true);
-    }//GEN-LAST:event_verRepresentantesActionPerformed
 
     private void botonCerrarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCerrarSesionActionPerformed
         Login login = new Login();  
@@ -264,15 +186,15 @@ public class MenuPrincipal extends javax.swing.JFrame {
     this.dispose();
     }//GEN-LAST:event_botonCerrarSesionActionPerformed
 
-    private void verReportesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verReportesActionPerformed
-        Reportes ventana = new Reportes();
-    ventana.setVisible(true);
-    }//GEN-LAST:event_verReportesActionPerformed
+    private void botonGestionPagosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonGestionPagosActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_botonGestionPagosActionPerformed
 
-    private void botonCorporacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCorporacionesActionPerformed
-       Corporacion ventana = new Corporacion();
-    ventana.setVisible(true);
-    }//GEN-LAST:event_botonCorporacionesActionPerformed
+    private void botonGestionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonGestionActionPerformed
+        GestionPersonas gestion = new GestionPersonas();
+        gestion.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_botonGestionActionPerformed
 
     /**
      * @param args the command line arguments
@@ -302,21 +224,15 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botonCerrarSesion;
-    private javax.swing.JButton botonCorporaciones;
-    private javax.swing.JButton botonVerDonadores;
-    private javax.swing.JButton botonVerDonativos;
+    private javax.swing.JButton botonConfig;
+    private javax.swing.JButton botonEventos;
+    private javax.swing.JButton botonGestion;
+    private javax.swing.JButton botonGestionPagos;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JButton verEventos;
-    private javax.swing.JButton verPagos;
-    private javax.swing.JButton verReportes;
-    private javax.swing.JButton verRepresentantes;
     // End of variables declaration//GEN-END:variables
 }
