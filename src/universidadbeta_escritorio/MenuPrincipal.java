@@ -4,6 +4,8 @@
  */
 package universidadbeta_escritorio;
 
+import java.awt.Color;
+
 /**
  *
  * @author contr
@@ -17,6 +19,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
      */
     public MenuPrincipal() {
         initComponents();
+        this.getContentPane().setBackground(new Color(224, 224, 224));
     }
 
     /**
@@ -43,26 +46,26 @@ public class MenuPrincipal extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 204));
 
-        jPanel1.setBackground(new java.awt.Color(0, 153, 255));
+        jPanel1.setBackground(new java.awt.Color(0, 153, 204));
 
-        jLabel1.setFont(new java.awt.Font("Yu Gothic Medium", 0, 18)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Yu Gothic Medium", 1, 18)); // NOI18N
         jLabel1.setText("Menu Principal");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(175, 175, 175)
                 .addComponent(jLabel1)
-                .addGap(184, 184, 184))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(18, Short.MAX_VALUE)
                 .addComponent(jLabel1)
-                .addContainerGap(26, Short.MAX_VALUE))
+                .addGap(14, 14, 14))
         );
 
         botonCerrarSesion.setBackground(new java.awt.Color(255, 153, 0));
@@ -76,7 +79,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         jLabel9.setFont(new java.awt.Font("Yu Gothic", 1, 12)); // NOI18N
         jLabel9.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\hand-holding-heart.png")); // NOI18N
-        jLabel9.setText("Personas y entidades");
+        jLabel9.setText("Gestion Principal");
 
         botonGestion.setBackground(new java.awt.Color(204, 204, 0));
         botonGestion.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\angle-right.png")); // NOI18N
@@ -91,7 +94,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         jLabel10.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\settings-sliders.png")); // NOI18N
         jLabel10.setText("Configuracion y reportes");
 
-        botonEventos.setBackground(new java.awt.Color(0, 153, 204));
+        botonEventos.setBackground(new java.awt.Color(0, 204, 204));
         botonEventos.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\angle-right.png")); // NOI18N
         botonEventos.setText("Entrar");
 
@@ -115,6 +118,11 @@ public class MenuPrincipal extends javax.swing.JFrame {
         botonConfig.setBackground(new java.awt.Color(153, 153, 153));
         botonConfig.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\angle-right.png")); // NOI18N
         botonConfig.setText("Entrar");
+        botonConfig.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonConfigActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -125,33 +133,34 @@ public class MenuPrincipal extends javax.swing.JFrame {
                 .addComponent(botonCerrarSesion)
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
-                .addGap(74, 74, 74)
+                .addGap(47, 47, 47)
                 .addComponent(botonGestion)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(botonEventos)
                 .addGap(92, 92, 92))
             .addGroup(layout.createSequentialGroup()
-                .addGap(12, 12, 12)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel9)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 128, Short.MAX_VALUE)
-                        .addComponent(jLabel12)
-                        .addGap(64, 64, 64))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel11)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(63, 63, 63)
-                                .addComponent(botonGestionPagos)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jLabel10)
-                                .addGap(61, 61, 61))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(botonConfig)
-                                .addGap(89, 89, 89))))))
+                        .addGap(12, 12, 12)
+                        .addComponent(jLabel11)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 147, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(botonGestionPagos)
+                        .addGap(163, 163, 163)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jLabel10)
+                        .addGap(61, 61, 61))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(botonConfig)
+                        .addGap(89, 89, 89))))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jLabel9)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel12)
+                .addGap(64, 64, 64))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -191,10 +200,16 @@ public class MenuPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_botonGestionPagosActionPerformed
 
     private void botonGestionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonGestionActionPerformed
-        GestionPersonas gestion = new GestionPersonas();
+        GestionPrincipal gestion = new GestionPrincipal();
         gestion.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_botonGestionActionPerformed
+
+    private void botonConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonConfigActionPerformed
+       Configuraciones config = new Configuraciones();
+       config.setVisible(true);
+       this.dispose();
+    }//GEN-LAST:event_botonConfigActionPerformed
 
     /**
      * @param args the command line arguments

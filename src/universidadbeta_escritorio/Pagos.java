@@ -4,6 +4,22 @@
  */
 package universidadbeta_escritorio;
 
+import java.awt.Color;
+import util.ConexionBD;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.table.DefaultTableModel;
+
+
 /**
  *
  * @author contr
@@ -11,12 +27,16 @@ package universidadbeta_escritorio;
 public class Pagos extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Pagos.class.getName());
-
+    private javax.swing.table.DefaultTableModel modeloTabla;
     /**
      * Creates new form Pagos
      */
     public Pagos() {
         initComponents();
+        configurarTabla();
+        cargarTabla();
+         this.getContentPane().setBackground(new Color(255, 235, 153));
+        deshabilitarEdicion();
     }
 
     /**
@@ -36,7 +56,6 @@ public class Pagos extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         txtMonto = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        jFormattedTextField1 = new javax.swing.JFormattedTextField();
         jLabel5 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtObservaciones = new javax.swing.JTextArea();
@@ -47,11 +66,13 @@ public class Pagos extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         tablaPagos = new javax.swing.JTable();
         botonVolver = new javax.swing.JButton();
+        txtFechaPago = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel1.setBackground(new java.awt.Color(255, 0, 204));
+        jPanel1.setBackground(new java.awt.Color(0, 204, 153));
 
+        jLabel1.setFont(new java.awt.Font("Yu Gothic", 1, 18)); // NOI18N
         jLabel1.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\file-invoice-dollar.png")); // NOI18N
         jLabel1.setText("Pago de Garantias");
 
@@ -60,27 +81,33 @@ public class Pagos extends javax.swing.JFrame {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(141, 141, 141)
+                .addGap(148, 148, 148)
                 .addComponent(jLabel1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(23, Short.MAX_VALUE)
                 .addComponent(jLabel1)
-                .addContainerGap())
+                .addGap(15, 15, 15))
         );
 
-        jLabel2.setText("Buscar garantia: ");
+        jLabel2.setText("Id garantia: ");
 
-        botonBuscarGarantia.setText("Buscar");
+        txtGarantia.setEditable(false);
+
+        botonBuscarGarantia.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\edit.png")); // NOI18N
+        botonBuscarGarantia.setText("Buscar garantia");
+        botonBuscarGarantia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonBuscarGarantiaActionPerformed(evt);
+            }
+        });
 
         jLabel3.setText("Monto de pago: ");
 
         jLabel4.setText("Fecha de pago:");
-
-        jFormattedTextField1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(java.text.DateFormat.getDateInstance(java.text.DateFormat.LONG))));
 
         jLabel5.setText("Observaciones:");
 
@@ -88,16 +115,29 @@ public class Pagos extends javax.swing.JFrame {
         txtObservaciones.setRows(5);
         jScrollPane1.setViewportView(txtObservaciones);
 
-        botonRegistrar.setText("Registrar");
+        botonRegistrar.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\check.png")); // NOI18N
+        botonRegistrar.setText("Registrar garantia");
+        botonRegistrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonRegistrarActionPerformed(evt);
+            }
+        });
 
-        botonEliminar.setText("Eliminar");
+        botonEliminar.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\cross.png")); // NOI18N
+        botonEliminar.setText("Eliminar garantia");
         botonEliminar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 botonEliminarActionPerformed(evt);
             }
         });
 
+        botonVerHistorial.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\calendar-clock.png")); // NOI18N
         botonVerHistorial.setText("Ver Historial");
+        botonVerHistorial.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonVerHistorialActionPerformed(evt);
+            }
+        });
 
         jLabel6.setFont(new java.awt.Font("Yu Gothic UI Semilight", 1, 24)); // NOI18N
         jLabel6.setText("Tabla de pagos");
@@ -116,7 +156,7 @@ public class Pagos extends javax.swing.JFrame {
         jScrollPane2.setViewportView(tablaPagos);
 
         botonVolver.setBackground(new java.awt.Color(102, 204, 0));
-        botonVolver.setText("Volver");
+        botonVolver.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-small-left.png")); // NOI18N
         botonVolver.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 botonVolverActionPerformed(evt);
@@ -129,47 +169,49 @@ public class Pagos extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(6, 6, 6)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(9, 9, 9)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel5))
-                        .addGap(57, 57, 57)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(botonVerHistorial)
-                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(txtMonto, javax.swing.GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE)
-                                    .addComponent(jFormattedTextField1))
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addGap(108, 108, 108)
+                        .addComponent(txtFechaPago, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel6))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 393, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(botonVolver))
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addGap(34, 34, 34)
-                                .addComponent(txtGarantia, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
-                                .addComponent(botonBuscarGarantia))
+                        .addContainerGap()
+                        .addComponent(botonRegistrar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(botonEliminar)
+                        .addGap(38, 38, 38)
+                        .addComponent(botonVerHistorial))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 393, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(botonRegistrar)
-                                        .addGap(43, 43, 43)
-                                        .addComponent(botonEliminar)))
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(botonVolver)))
-                        .addContainerGap())))
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(42, 42, 42))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel5)
+                                .addComponent(jLabel4)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel3)
+                                        .addComponent(jLabel2))
+                                    .addGap(18, 18, 18)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                            .addComponent(txtMonto, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addGap(0, 0, Short.MAX_VALUE))
+                                        .addGroup(layout.createSequentialGroup()
+                                            .addComponent(txtGarantia, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
+                                            .addComponent(botonBuscarGarantia))))))))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -178,48 +220,535 @@ public class Pagos extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txtGarantia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(botonBuscarGarantia))
+                        .addComponent(botonBuscarGarantia)
+                        .addComponent(txtGarantia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel2))
-                .addGap(32, 32, 32)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(txtMonto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(27, 27, 27)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                    .addComponent(txtFechaPago, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(28, 28, 28)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel5)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(41, 41, 41)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(24, 24, 24)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(botonRegistrar)
                     .addComponent(botonEliminar)
                     .addComponent(botonVerHistorial))
-                .addGap(34, 34, 34)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(29, 29, 29)
                         .addComponent(jLabel6)
-                        .addGap(26, 26, 26)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(botonVolver))
-                .addContainerGap(81, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(botonVolver))))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+     private void configurarTabla() {
+        String[] columnas = {"ID Pago", "Garantía", "Monto", "Fecha", "Estado", "Observaciones"};
+        modeloTabla = new DefaultTableModel(columnas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        tablaPagos.setModel(modeloTabla);
+        
+        // Doble clic en tabla
+        tablaPagos.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    cargarPagoDesdeTabla();
+                }
+            }
+        });
+    }
+    
+    
+    private void deshabilitarEdicion() {
+        botonEliminar.setEnabled(false);
+    }
+    
+private void buscarGarantia(String idGarantia) {
+    // QUITAR los comentarios /**/ del SQL
+    String sql = "SELECT G.idGarantia, G.cantidadGarantizada, " +
+                 "ISNULL(G.cantidadEnviada, 0) as cantidadEnviada, " +
+                 "D.nombre as donador, G.fechaGarantia " +
+                 "FROM Garantia G " +
+                 "JOIN Donador D ON G.idDonador = D.idDonador " +
+                 "WHERE G.idGarantia = ?";
+    
+    try (Connection con = ConexionBD.getConexion();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        
+        ps.setString(1, idGarantia);
+        ResultSet rs = ps.executeQuery();
+        
+        if (rs.next()) {
+            double cantidadGarantizada = rs.getDouble("cantidadGarantizada");
+            double cantidadEnviada = rs.getDouble("cantidadEnviada");
+            String donador = rs.getString("donador");
+            
+            // Calcular estado
+            String estado = "Activa";
+            double saldoPendiente = cantidadGarantizada - cantidadEnviada;
+            
+            if (saldoPendiente <= 0) {
+                estado = "Completada";
+            } else if (cantidadEnviada > 0) {
+                estado = "Parcial";
+            }
+            
+            if ("Completada".equals(estado)) {
+                JOptionPane.showMessageDialog(this,
+                    "La garantía ya está completada (pagada totalmente).",
+                    "Garantía completada",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            txtGarantia.setText(idGarantia + " - " + donador);
+            
+            JOptionPane.showMessageDialog(this,
+                "✅ Garantía encontrada\n\n" +
+                "ID: " + idGarantia + "\n" +
+                "Donador: " + donador + "\n" +
+                "Monto garantizado: $" + cantidadGarantizada + "\n" +
+                "Monto enviado: $" + cantidadEnviada + "\n" +
+                "Saldo pendiente: $" + saldoPendiente + "\n" +
+                "Estado: " + estado,
+                "Garantía válida",
+                JOptionPane.INFORMATION_MESSAGE);
+            
+        } else {
+            JOptionPane.showMessageDialog(this,
+                "No se encontró garantía con ID: " + idGarantia,
+                "Garantía no encontrada",
+                JOptionPane.WARNING_MESSAGE);
+        }
+        
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this,
+            "Error al buscar garantía: " + e.getMessage(),
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
+    }
+}
+    
+private void registrarPago(){
+    if (!validarCampos()) {
+        return;
+    }
+    
+    // Extraer ID de garantía
+    String textoGarantia = txtGarantia.getText().trim();
+    String[] partes = textoGarantia.split(" - ");
+    if (partes.length < 1) {
+        JOptionPane.showMessageDialog(this, "Formato de garantía inválido");
+        return;
+    }
+    
+    String idGarantia = partes[0];
+    
+    // Validar fecha (ahora es un JTextField normal)
+    String fechaPago = txtFechaPago.getText().trim(); // Esto ahora es un JTextField
+    
+    // Validar formato de fecha (yyyy-MM-dd)
+    if (!fechaPago.matches("\\d{2}/\\d{2}/\\d{4}")) {
+        JOptionPane.showMessageDialog(this,
+            "Formato de fecha inválido.\nUse: DD/MM/YYYY",
+            "Error de fecha",
+            JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    // Verificar saldo
+    String verificarSaldoSQL = "SELECT cantidadGarantizada, ISNULL(cantidadEnviada, 0) as cantidadEnviada " +
+                               "FROM Garantia WHERE idGarantia = ?";
+    
+    try (Connection con = ConexionBD.getConexion();
+         PreparedStatement ps = con.prepareStatement(verificarSaldoSQL)) {
+        
+        ps.setString(1, idGarantia);
+        ResultSet rs = ps.executeQuery();
+        
+        if (rs.next()) {
+            double cantidadGarantizada = rs.getDouble("cantidadGarantizada");
+            double cantidadEnviada = rs.getDouble("cantidadEnviada");
+            double saldoPendiente = cantidadGarantizada - cantidadEnviada;
+            double montoAPagar = Double.parseDouble(txtMonto.getText().trim());
+            
+            if (montoAPagar > saldoPendiente) {
+                JOptionPane.showMessageDialog(this,
+                    "⚠️ El monto excede el saldo pendiente\n\n" +
+                    "Saldo pendiente: $" + String.format("%,.2f", saldoPendiente) + "\n" +
+                    "Monto a pagar: $" + String.format("%,.2f", montoAPagar),
+                    "Monto excedido",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+        }
+        
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error al verificar saldo: " + e.getMessage());
+        return;
+    }
+    
+    // Registrar el pago
+    String insertSQL = "INSERT INTO Pago (idGarantia, montoPago, fechaPago, observaciones) VALUES (?, ?, ?, ?)";
+    
+    try (Connection con = ConexionBD.getConexion();
+         PreparedStatement ps = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
+        
+        ps.setString(1, idGarantia);
+        ps.setDouble(2, Double.parseDouble(txtMonto.getText().trim()));
+        ps.setString(3, fechaPago); // ← Usar la fecha validada
+        ps.setString(4, txtObservaciones.getText().trim());
+        
+        int filasAfectadas = ps.executeUpdate();
+        
+        if (filasAfectadas > 0) {
+            // Actualizar cantidadEnviada en Garantia
+            String actualizarGarantiaSQL = "UPDATE Garantia SET cantidadEnviada = ISNULL(cantidadEnviada, 0) + ? WHERE idGarantia = ?";
+            
+            try (PreparedStatement psUpdate = con.prepareStatement(actualizarGarantiaSQL)) {
+                psUpdate.setDouble(1, Double.parseDouble(txtMonto.getText().trim()));
+                psUpdate.setString(2, idGarantia);
+                psUpdate.executeUpdate();
+            }
+            
+            // Obtener ID del pago generado
+            ResultSet generatedKeys = ps.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                int idGenerado = generatedKeys.getInt(1);
+                
+                JOptionPane.showMessageDialog(this,
+                    "✅ Pago registrado exitosamente!\n\n" +
+                    "🔹 ID Pago: " + idGenerado + "\n" +
+                    "🔹 Garantía: " + idGarantia + "\n" +
+                    "🔹 Monto: $" + txtMonto.getText().trim() + "\n" +
+                    "🔹 Fecha: " + fechaPago,
+                    "Registro exitoso",
+                    JOptionPane.INFORMATION_MESSAGE);
+            }
+            
+            cargarTabla();
+            limpiarCampos();
+        }
+        
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this,
+            "❌ Error al registrar pago:\n" + e.getMessage(),
+            "Error de base de datos",
+            JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }
+}
+
+ private void eliminarPago(String idPago) {
+        String sql = "DELETE FROM Pago WHERE idPago = ?";
+        
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setString(1, idPago);
+            int filasAfectadas = ps.executeUpdate();
+            
+            if (filasAfectadas > 0) {
+                JOptionPane.showMessageDialog(this,
+                    "Pago eliminado exitosamente",
+                    "Eliminación exitosa",
+                    JOptionPane.INFORMATION_MESSAGE);
+                
+                cargarTabla();
+                limpiarCampos();
+            }
+            
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this,
+                "Error al eliminar: " + e.getMessage(),
+                "Error de base de datos",
+                JOptionPane.ERROR_MESSAGE);
+        }
+    }
+ private void cargarTabla() {
+    String sql = """
+        SELECT 
+            P.idPago,
+            P.idGarantia,
+            P.montoPago as monto,  
+            CONVERT(VARCHAR, P.fechaPago, 23) as fechaPago,
+            'Pagado' as estado,    
+            P.observaciones,
+            D.nombre as donador
+        FROM Pago P
+        LEFT JOIN Garantia G ON P.idGarantia = G.idGarantia
+        LEFT JOIN Donador D ON G.idDonador = D.idDonador
+        ORDER BY P.fechaPago DESC
+        """;
+    
+    try (Connection con = ConexionBD.getConexion();
+         PreparedStatement ps = con.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+        
+        modeloTabla.setRowCount(0);
+        
+        while (rs.next()) {
+            String donador = rs.getString("donador");
+            if (donador == null) donador = "Sin donador";
+            
+            String idGarantia = rs.getString("idGarantia");
+            String monto = rs.getString("monto");
+            String fecha = rs.getString("fechaPago");
+            String estado = rs.getString("estado");
+            String observaciones = rs.getString("observaciones");
+            
+            modeloTabla.addRow(new Object[]{
+                rs.getString("idPago"),
+                idGarantia + " - " + donador,
+                monto,
+                fecha,
+                estado,
+                observaciones
+            });
+        }
+        
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this,
+            "Error al cargar pagos: " + e.getMessage(),
+            "Error de base de datos",
+            JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }
+}
+    
+    private void cargarPagoDesdeTabla() {
+        int fila = tablaPagos.getSelectedRow();
+        if (fila == -1) return;
+        
+        String idPago = modeloTabla.getValueAt(fila, 0).toString();
+        
+        String sql = "SELECT idGarantia, montoPago, fechaPago, observaciones FROM Pago WHERE idPago = ?";
+        
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setString(1, idPago);
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                txtGarantia.setText(rs.getString("idGarantia"));
+                txtMonto.setText(String.valueOf(rs.getDouble("montoPago")));
+                txtFechaPago.setText(rs.getString("fechaPago"));
+                txtObservaciones.setText(rs.getString("observaciones"));
+                botonEliminar.setEnabled(true);
+            }
+            
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al cargar pago: " + e.getMessage());
+        }
+    }
+    
+private boolean validarCampos() {
+        if (txtGarantia.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Debe buscar una garantía primero");
+            txtGarantia.requestFocus();
+            return false;
+        }
+        
+        if (txtMonto.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "El monto es obligatorio");
+            txtMonto.requestFocus();
+            return false;
+        }
+        
+        try {
+            double monto = Double.parseDouble(txtMonto.getText().trim());
+            if (monto <= 0) {
+                JOptionPane.showMessageDialog(this, "El monto debe ser mayor a cero");
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "El monto debe ser un número válido");
+            return false;
+        }
+        
+        if (txtFechaPago.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "La fecha es obligatoria");
+            return false;
+        }
+        
+        return true;
+    }
+    private String convertirFechaSQL(String fecha) {
+        try {
+            SimpleDateFormat entrada = new SimpleDateFormat("dd/MM/yyyy");
+            SimpleDateFormat salida = new SimpleDateFormat("yyyy-MM-dd");
+            return salida.format(entrada.parse(fecha));
+        } catch (Exception e) {
+            return LocalDate.now().toString();
+        }  
+    } 
+    private void limpiarCampos() {
+        txtGarantia.setText("");
+        txtMonto.setText("");
+        txtFechaPago.setText("");
+        txtObservaciones.setText("");
+        botonEliminar.setEnabled(false);
+        tablaPagos.clearSelection();
+        txtGarantia.requestFocus();
+    }
+    
+    public void eliminar(){
+        int fila = tablaPagos.getSelectedRow();
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this,
+                "Seleccione un pago de la tabla para eliminar",
+                "Selección requerida",
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        String idPago = modeloTabla.getValueAt(fila, 0).toString();
+        String garantia = modeloTabla.getValueAt(fila, 1).toString();
+        String monto = modeloTabla.getValueAt(fila, 2).toString();
+        
+        int confirmacion = JOptionPane.showConfirmDialog(this,
+            "¿Está seguro de eliminar este pago?\n\n" +
+            "ID: " + idPago + "\n" +
+            "Garantía: " + garantia + "\n" +
+            "Monto: " + monto,
+            "Confirmar eliminación",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+        
+        if (confirmacion == JOptionPane.YES_OPTION) {
+            eliminarPago(idPago);
+        }
+    }
+public void historial(){
+    String idGarantia = JOptionPane.showInputDialog(this,
+        "Ingrese ID de la garantía para ver su historial:",
+        "Historial por Garantía",
+        JOptionPane.QUESTION_MESSAGE);
+    
+    if (idGarantia == null || idGarantia.trim().isEmpty()) {
+        return;
+    }
+    
+    String sql = """
+        SELECT 
+            P.idPago,
+            P.montoPago,
+            CONVERT(VARCHAR, P.fechaPago, 23) as fechaPago,
+            P.observaciones,
+            D.nombre as donador,
+            G.cantidadGarantizada as totalGarantia
+        FROM Pago P
+        JOIN Garantia G ON P.idGarantia = G.idGarantia
+        JOIN Donador D ON G.idDonador = D.idDonador
+        WHERE P.idGarantia = ?
+        ORDER BY P.fechaPago
+        """;
+    
+    try (Connection con = ConexionBD.getConexion();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        
+        ps.setString(1, idGarantia.trim());
+        ResultSet rs = ps.executeQuery();
+        
+        StringBuilder historial = new StringBuilder();
+        historial.append("📋 HISTORIAL DE PAGOS - Garantía #").append(idGarantia).append("\n\n");
+        
+        double totalPagado = 0;
+        int numPagos = 0;
+        double totalGarantia = 0;
+        
+        while (rs.next()) {
+            numPagos++;
+            double monto = rs.getDouble("montoPago");
+            totalPagado += monto;
+            
+            // Obtener totalGarantia solo en la primera iteración
+            if (numPagos == 1) {
+                totalGarantia = rs.getDouble("totalGarantia");
+            }
+            
+            historial.append(numPagos).append(". ")
+                    .append(rs.getString("fechaPago")).append(" - $")
+                    .append(String.format("%,.2f", monto)).append("\n");
+            
+            if (rs.getString("observaciones") != null) {
+                historial.append("   Obs: ").append(rs.getString("observaciones")).append("\n");
+            }
+        }
+        
+        if (numPagos == 0) {
+            historial.append("No hay pagos registrados para esta garantía.");
+        } else {
+            double saldo = totalGarantia - totalPagado;
+            
+            historial.append("\n").append("═".repeat(50)).append("\n");
+            historial.append("RESUMEN:\n");
+            historial.append("• Total garantía: $").append(String.format("%,.2f", totalGarantia)).append("\n");
+            historial.append("• Total pagado: $").append(String.format("%,.2f", totalPagado)).append("\n");
+            historial.append("• Saldo pendiente: $").append(String.format("%,.2f", saldo)).append("\n");
+            historial.append("• Porcentaje pagado: ").append(String.format("%.1f%%", (totalPagado / totalGarantia) * 100));
+        }
+        
+        // Mostrar historial
+        JTextArea textArea = new JTextArea(historial.toString(), 20, 50);
+        textArea.setEditable(false);
+        
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new java.awt.Dimension(600, 400));
+        
+        JOptionPane.showMessageDialog(this, scrollPane, 
+            "Historial de Pagos - Garantía #" + idGarantia, 
+            JOptionPane.INFORMATION_MESSAGE);
+        
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+    }
+}
     private void botonEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonEliminarActionPerformed
-        // TODO add your handling code here:
+        eliminar();
     }//GEN-LAST:event_botonEliminarActionPerformed
 
     private void botonVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonVolverActionPerformed
-       MenuPrincipal menu = new MenuPrincipal();   
-    menu.setVisible(true);
-    this.dispose(); 
+       Donativos d = new Donativos();
+       d.setVisible(true);
+       this.dispose();
     }//GEN-LAST:event_botonVolverActionPerformed
+
+    private void botonBuscarGarantiaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonBuscarGarantiaActionPerformed
+        String idGarantia = JOptionPane.showInputDialog(this,
+            "Ingrese ID de la garantía:",
+            "Buscar Garantía",
+            JOptionPane.QUESTION_MESSAGE);
+        
+        if (idGarantia != null && !idGarantia.trim().isEmpty()) {
+            buscarGarantia(idGarantia.trim());
+    }//GEN-LAST:event_botonBuscarGarantiaActionPerformed
+ } 
+    private void botonRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonRegistrarActionPerformed
+    registrarPago();
+    }//GEN-LAST:event_botonRegistrarActionPerformed
+
+    private void botonVerHistorialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonVerHistorialActionPerformed
+        historial();
+    }//GEN-LAST:event_botonVerHistorialActionPerformed
 
     /**
      * @param args the command line arguments
@@ -252,7 +781,6 @@ public class Pagos extends javax.swing.JFrame {
     private javax.swing.JButton botonRegistrar;
     private javax.swing.JButton botonVerHistorial;
     private javax.swing.JButton botonVolver;
-    private javax.swing.JFormattedTextField jFormattedTextField1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -263,6 +791,7 @@ public class Pagos extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable tablaPagos;
+    private javax.swing.JTextField txtFechaPago;
     private javax.swing.JTextField txtGarantia;
     private javax.swing.JTextField txtMonto;
     private javax.swing.JTextArea txtObservaciones;

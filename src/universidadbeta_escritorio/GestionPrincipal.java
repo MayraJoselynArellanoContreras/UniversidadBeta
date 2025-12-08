@@ -8,14 +8,14 @@ package universidadbeta_escritorio;
  *
  * @author contr
  */
-public class GestionPersonas extends javax.swing.JFrame {
+public class GestionPrincipal extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GestionPersonas.class.getName());
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GestionPrincipal.class.getName());
 
     /**
      * Creates new form GestionPersonas
      */
-    public GestionPersonas() {
+    public GestionPrincipal() {
         initComponents();
     }
 
@@ -33,12 +33,10 @@ public class GestionPersonas extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         botonDonadores = new javax.swing.JButton();
-        jLabel3 = new javax.swing.JLabel();
-        botonCorporacion = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         botonRepresentantes = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
-        botonVoluntarios = new javax.swing.JButton();
+        botonCorporaciones = new javax.swing.JButton();
         botonVolver = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -48,16 +46,16 @@ public class GestionPersonas extends javax.swing.JFrame {
         jPanel2.setBackground(new java.awt.Color(93, 173, 226));
 
         jLabel1.setFont(new java.awt.Font("Yu Gothic", 1, 18)); // NOI18N
-        jLabel1.setText("GESTION DE PERSONAS Y ENTIDADES");
+        jLabel1.setText("GESTIÓN PRINCIPAL");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(191, Short.MAX_VALUE)
                 .addComponent(jLabel1)
-                .addGap(88, 88, 88))
+                .addGap(183, 183, 183))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -80,19 +78,6 @@ public class GestionPersonas extends javax.swing.JFrame {
             }
         });
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel3.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\resources.png")); // NOI18N
-        jLabel3.setText("Corporacion");
-
-        botonCorporacion.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-up-right.png")); // NOI18N
-        botonCorporacion.setText("Ingresar");
-        botonCorporacion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botonCorporacionActionPerformed(evt);
-            }
-        });
-
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\chart-tree.png")); // NOI18N
@@ -100,17 +85,22 @@ public class GestionPersonas extends javax.swing.JFrame {
 
         botonRepresentantes.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-up-right.png")); // NOI18N
         botonRepresentantes.setText("Ingresar");
+        botonRepresentantes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonRepresentantesActionPerformed(evt);
+            }
+        });
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\book-open-reader.png")); // NOI18N
-        jLabel5.setText("Voluntarios");
+        jLabel5.setText("Corporaciones");
 
-        botonVoluntarios.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-up-right.png")); // NOI18N
-        botonVoluntarios.setText("Ingresar");
-        botonVoluntarios.addActionListener(new java.awt.event.ActionListener() {
+        botonCorporaciones.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-up-right.png")); // NOI18N
+        botonCorporaciones.setText("Ingresar");
+        botonCorporaciones.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botonVoluntariosActionPerformed(evt);
+                botonCorporacionesActionPerformed(evt);
             }
         });
 
@@ -137,18 +127,16 @@ public class GestionPersonas extends javax.swing.JFrame {
                         .addComponent(jLabel2)
                         .addGap(41, 41, 41)
                         .addComponent(botonDonadores)))
-                .addGap(82, 82, 82)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel3))
-                .addGap(36, 36, 36)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(botonCorporacion)
-                    .addComponent(botonVoluntarios))
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(botonVolver))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel5)
+                .addGap(27, 27, 27)
+                .addComponent(botonCorporaciones)
+                .addGap(26, 26, 26))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -157,16 +145,16 @@ public class GestionPersonas extends javax.swing.JFrame {
                 .addGap(25, 25, 25)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(botonDonadores)
-                    .addComponent(jLabel3)
-                    .addComponent(botonCorporacion))
-                .addGap(45, 45, 45)
+                    .addComponent(botonDonadores))
+                .addGap(8, 8, 8)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(botonCorporaciones))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(botonRepresentantes)
-                    .addComponent(jLabel5)
-                    .addComponent(botonVoluntarios))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 48, Short.MAX_VALUE)
+                    .addComponent(botonRepresentantes))
+                .addGap(31, 31, 31)
                 .addComponent(botonVolver))
         );
 
@@ -190,9 +178,11 @@ public class GestionPersonas extends javax.swing.JFrame {
        this.dispose();
     }//GEN-LAST:event_botonDonadoresActionPerformed
 
-    private void botonVoluntariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonVoluntariosActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_botonVoluntariosActionPerformed
+    private void botonCorporacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCorporacionesActionPerformed
+        Corporacion c = new Corporacion();
+        c.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_botonCorporacionesActionPerformed
 
     private void botonVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonVolverActionPerformed
         MenuPrincipal menu = new MenuPrincipal();   
@@ -200,11 +190,11 @@ public class GestionPersonas extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_botonVolverActionPerformed
 
-    private void botonCorporacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCorporacionActionPerformed
-        Corporacion corporacion = new Corporacion();
-        corporacion.setVisible(true);
+    private void botonRepresentantesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonRepresentantesActionPerformed
+        Representantes r = new Representantes();
+        r.setVisible(true);
         this.dispose();
-    }//GEN-LAST:event_botonCorporacionActionPerformed
+    }//GEN-LAST:event_botonRepresentantesActionPerformed
 
     /**
      * @param args the command line arguments
@@ -228,18 +218,16 @@ public class GestionPersonas extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new GestionPersonas().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new GestionPrincipal().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton botonCorporacion;
+    private javax.swing.JButton botonCorporaciones;
     private javax.swing.JButton botonDonadores;
     private javax.swing.JButton botonRepresentantes;
-    private javax.swing.JButton botonVoluntarios;
     private javax.swing.JButton botonVolver;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
