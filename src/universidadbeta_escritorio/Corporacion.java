@@ -577,8 +577,8 @@ private void eliminarCorporacion() {
     }//GEN-LAST:event_botonLimpiarActionPerformed
 
     private void botonVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonVolverActionPerformed
-        MenuPrincipal menu = new MenuPrincipal();   
-    menu.setVisible(true);
+        GestionPrincipal gestion = new GestionPrincipal();
+    gestion.setVisible(true);
     this.dispose();  
     }//GEN-LAST:event_botonVolverActionPerformed
 

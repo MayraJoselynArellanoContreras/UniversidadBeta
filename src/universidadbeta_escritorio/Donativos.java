@@ -5,8 +5,6 @@
 package universidadbeta_escritorio;
 
 import java.awt.Color;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.math.BigDecimal;
 import javax.swing.JOptionPane;
 import util.ConexionBD;
@@ -36,7 +34,6 @@ public class Donativos extends javax.swing.JFrame {
         cargarCorporaciones();
         cargarTabla();
         cargarProximoIdDonativo();
-        configurarPlaceholderFecha();
         habilitarCampoTarjeta();
     }
     
@@ -56,28 +53,6 @@ public class Donativos extends javax.swing.JFrame {
         public String toString() {
             return nombre;
         }
-    }
-    
-    private void configurarPlaceholderFecha() {
-        txtFechaRegistro.setText("dd/mm/aaaa");
-        txtFechaRegistro.setForeground(Color.GRAY);
-        txtFechaRegistro.addFocusListener(new FocusAdapter() {
-
-            public void focusGained(FocusEvent e) {
-                if (txtFechaRegistro.getText().equals("dd/mm/aaaa")) {
-                    txtFechaRegistro.setText("");
-                    txtFechaRegistro.setForeground(Color.BLACK);
-                }
-            }
-            
-
-            public void focusLost(FocusEvent e) {
-                if (txtFechaRegistro.getText().isEmpty()) {
-                    txtFechaRegistro.setText("dd/mm/aaaa");
-                    txtFechaRegistro.setForeground(Color.GRAY);
-                }
-            }
-        });
     }
     
     private void cargarMetodosPago() {
@@ -122,7 +97,7 @@ public class Donativos extends javax.swing.JFrame {
         }
     }
     
-   private void cargarProximoIdDonativo() {
+  private void cargarProximoIdDonativo() {
     try (Connection con = ConexionBD.getConexion()) {
         String sql = "SELECT ISNULL(IDENT_CURRENT('Donativo'), 0) + 1 AS siguiente";
         
@@ -140,61 +115,64 @@ public class Donativos extends javax.swing.JFrame {
     }
 }
     
-    private void cargarTabla() {
-        String sql = """
-            SELECT 
-                D.idDonativo,
-                D.fechaGarantia,
-                D.cantidadGarantizada,
-                D.cantidadRecibida,
-                D.metodoPago,
-                D.numeroPagos,
-                DO.nombre as donador,
-                C.nombre as corporacion,
-                D.Observaciones
-            FROM Donativo D
-            LEFT JOIN Donador DO ON D.idDonador = DO.idDonador
-            LEFT JOIN Corporacion C ON D.idCorporacion = C.idCorporacion
-            ORDER BY D.idDonativo DESC
-            """;
+private void cargarTabla() {
+    String sql = """
+        SELECT 
+            D.idDonativo,
+            D.fechaGarantia,
+            D.cantidadGarantizada,
+            D.cantidadRecibida,
+            D.metodoPago,
+            D.numeroPagos,
+            DO.nombre as donador,
+            C.nombre as corporacion,
+            D.Observaciones,
+            DO.circuloDonador  -- Agregar esta columna
+        FROM Donativo D
+        LEFT JOIN Donador DO ON D.idDonador = DO.idDonador
+        LEFT JOIN Corporacion C ON D.idCorporacion = C.idCorporacion
+        ORDER BY D.idDonativo DESC
+        """;
+    
+    try (Connection con = ConexionBD.getConexion();
+         PreparedStatement ps = con.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
         
-        try (Connection con = ConexionBD.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        javax.swing.table.DefaultTableModel modelo = 
+            new javax.swing.table.DefaultTableModel(
+                new Object[]{"ID", "Fecha", "Garantía", "Recibido", "Método", 
+                           "Pagos", "Donador", "Corporación", "Observaciones", "Círculo"}, 0) {
             
-            javax.swing.table.DefaultTableModel modelo = 
-                new javax.swing.table.DefaultTableModel(
-                    new Object[]{"ID", "Fecha", "Garantía", "Recibido", "Método", "Pagos", "Donador", "Corporación", "Observaciones"}, 0) {
-                
-                @Override
-                public boolean isCellEditable(int row, int column) {
-                    return false;
-                }
-            };
-            
-            while (rs.next()) {
-                modelo.addRow(new Object[]{
-                    rs.getInt("idDonativo"),
-                    rs.getString("fechaGarantia"),
-                    rs.getBigDecimal("cantidadGarantizada"),
-                    rs.getBigDecimal("cantidadRecibida"),
-                    rs.getString("metodoPago"),
-                    rs.getInt("numeroPagos"),
-                    rs.getString("donador"),
-                    rs.getString("corporacion"),
-                    rs.getString("Observaciones")
-                });
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
             }
-            
-            tablaHistorial.setModel(modelo);
-            
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this,
-                "Error al cargar donativos: " + e.getMessage(),
-                "Error BD",
-                JOptionPane.ERROR_MESSAGE);
+        };
+        
+        while (rs.next()) {
+            modelo.addRow(new Object[]{
+                rs.getInt("idDonativo"),
+                rs.getString("fechaGarantia"),
+                rs.getBigDecimal("cantidadGarantizada"),
+                rs.getBigDecimal("cantidadRecibida"),
+                rs.getString("metodoPago"),
+                rs.getInt("numeroPagos"),
+                rs.getString("donador"),
+                rs.getString("corporacion"),
+                rs.getString("Observaciones"),
+                rs.getString("circuloDonador")  // Mostrar círculo
+            });
         }
+        
+        tablaHistorial.setModel(modelo);
+        
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this,
+            "Error al cargar donativos: " + e.getMessage(),
+            "Error BD",
+            JOptionPane.ERROR_MESSAGE);
     }
+}
     
     private void habilitarCampoTarjeta() {
         String metodo = comboMetodo.getSelectedItem().toString();
@@ -213,15 +191,27 @@ public class Donativos extends javax.swing.JFrame {
         boolean hayErrores = false;
         
         // Validar donador
-        String idDonador = txtIdDonador.getText().trim();
+        String idDonador = txtIdGarantia.getText().trim();
         if (idDonador.isEmpty() || txtNombreDonador.getText().trim().isEmpty()) {
             errores.append("• Debe buscar y seleccionar un donador\n");
-            txtIdDonador.setBackground(new Color(255, 200, 200));
+            txtIdGarantia.setBackground(new Color(255, 200, 200));
             hayErrores = true;
         }
         
-        // Validar fecha
-        String fecha = txtFechaRegistro.getText().trim();
+        // Validar fecha de la garantia
+        String fecha = txtFechaGarantia.getText().trim();
+        if (fecha.isEmpty() || fecha.equals("dd/mm/aaaa")) {
+            errores.append("• La fecha es obligatoria\n");
+            txtFechaGarantia.setBackground(new Color(255, 200, 200));
+            hayErrores = true;
+        } else if (!fecha.matches("\\d{2}/\\d{2}/\\d{4}")) {
+            errores.append("• Formato de fecha inválido (dd/mm/aaaa)\n");
+            txtFechaGarantia.setBackground(new Color(255, 200, 200));
+            hayErrores = true;
+        }
+        
+        // Validar fecha de registro del donativo
+        String fechaR = txtFechaRegistro.getText().trim();
         if (fecha.isEmpty() || fecha.equals("dd/mm/aaaa")) {
             errores.append("• La fecha es obligatoria\n");
             txtFechaRegistro.setBackground(new Color(255, 200, 200));
@@ -348,7 +338,7 @@ public class Donativos extends javax.swing.JFrame {
             ResultSet rs = ps.executeQuery();
             
             if (rs.next()) {
-                txtIdDonador.setText(rs.getString("idDonador"));
+                txtIdGarantia.setText(rs.getString("idDonador"));
                 txtNombreDonador.setText(rs.getString("nombre"));
                 
                 JOptionPane.showMessageDialog(this,
@@ -372,149 +362,333 @@ public class Donativos extends javax.swing.JFrame {
         }
     }
     
-    private void registrarDonativo() {
-        if (!validarCampos()) {
-            return;
+ private void registrarDonativo() {
+    if (!validarCampos()) {
+        return;
+    }
+    
+    // Verificar qué dice el botón
+    String textoBoton = botonRegistrar.getText();
+    
+    if (textoBoton.equals("Registrar Donativo")) {
+        guardarNuevoDonativo();
+    } else if (textoBoton.equals("Actualizar Donativo")) {
+        actualizarDonativo();
+    } else {
+        // Por defecto, registrar como nuevo
+        guardarNuevoDonativo();
+    }
+}
+    
+private void guardarNuevoDonativo() {
+    if (!validarCampos()) {
+        return;
+    }
+    
+    Connection con = null;
+    try {
+        con = ConexionBD.getConexion();
+        con.setAutoCommit(false); // Iniciar transacción
+        
+        // 1. Insertar el donativo
+        String sqlDonativo = """
+            INSERT INTO Donativo (
+                idDonador, fechaGarantia, cantidadGarantizada,
+                cantidadRecibida, metodoPago, numeroPagos,
+                numeroTarjeta, idCorporacion, Observaciones
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """;
+        
+        BigDecimal cantidadRecibida = new BigDecimal(txtCantidadRecibida.getText().trim());
+        String idDonador = txtIdGarantia.getText().trim();
+        
+        try (PreparedStatement ps = con.prepareStatement(sqlDonativo, Statement.RETURN_GENERATED_KEYS)) {
+            
+            ps.setString(1, idDonador);
+            ps.setString(2, convertirFechaSQL(txtFechaGarantia.getText().trim()));
+            ps.setBigDecimal(3, new BigDecimal(txtCantidadGarantizada.getText().trim()));
+            ps.setBigDecimal(4, cantidadRecibida);
+            ps.setString(5, comboMetodo.getSelectedItem().toString());
+            ps.setInt(6, Integer.parseInt(comboNumPagos.getSelectedItem().toString()));
+            
+            if (comboMetodo.getSelectedItem().toString().equals("Tarjeta de Crédito")) {
+                ps.setString(7, txtNumTDC.getText().trim());
+            } else {
+                ps.setString(7, null);
+            }
+            
+            CorporacionItem corp = (CorporacionItem) comboCorporacion.getSelectedItem();
+            ps.setInt(8, corp.getId());
+            
+            String observaciones = txtObservaciones.getText().trim();
+            ps.setString(9, observaciones.isEmpty() ? null : observaciones);
+            
+            int filas = ps.executeUpdate();
+            
+            if (filas > 0) {
+                ResultSet rs = ps.getGeneratedKeys();
+                int idGenerado = 0;
+                if (rs.next()) {
+                    idGenerado = rs.getInt(1);
+                }
+                
+                // 2. ACTUALIZAR TOTAL DONADO Y CÍRCULO DEL DONADOR
+                actualizarCirculoDonador(con, idDonador, cantidadRecibida);
+                
+                // Confirmar transacción
+                con.commit();
+                
+                JOptionPane.showMessageDialog(this,
+                    "✅ Donativo registrado exitosamente\n\n" +
+                    "ID Donativo: " + idGenerado + "\n" +
+                    "Donador: " + txtNombreDonador.getText() + "\n" +
+                    "Monto: $" + String.format("%,.2f", cantidadRecibida) + "\n" +
+                    "Círculo actualizado automáticamente",
+                    "Registro exitoso",
+                    JOptionPane.INFORMATION_MESSAGE);
+                
+                limpiarCampos();
+                 cargarProximoIdDonativo();
+                cargarTabla();            }
         }
         
-        String idStr = txtIdDonativo.getText().trim();
-        boolean esEdicion = !idStr.isEmpty() && idStr.matches("\\d+");
+    } catch (SQLException e) {
+        try {
+            if (con != null) {
+                con.rollback(); // Revertir en caso de error
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
         
-        if (esEdicion) {
-            actualizarDonativo();
-        } else {
-            guardarNuevoDonativo();
+        JOptionPane.showMessageDialog(this,
+            "Error al guardar donativo:\n" + e.getMessage(),
+            "Error BD",
+            JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+        
+    } finally {
+        try {
+            if (con != null) {
+                con.setAutoCommit(true);
+                con.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+private void actualizarCirculoDonador(Connection con, String idDonador, BigDecimal montoDonativo) throws SQLException {
+    // 1. Sumar al total donado
+    String sqlSumar = """
+        UPDATE Donador 
+        SET totalDonado = ISNULL(totalDonado, 0) + ?
+        WHERE idDonador = ?
+        """;
+    
+    try (PreparedStatement ps = con.prepareStatement(sqlSumar)) {
+        ps.setBigDecimal(1, montoDonativo);
+        ps.setString(2, idDonador);
+        ps.executeUpdate();
+    }
+    
+    // 2. Obtener el nuevo total donado
+    String sqlObtenerTotal = """
+        SELECT ISNULL(totalDonado, 0) as total 
+        FROM Donador 
+        WHERE idDonador = ?
+        """;
+    
+    BigDecimal totalDonado = BigDecimal.ZERO;
+    try (PreparedStatement ps = con.prepareStatement(sqlObtenerTotal)) {
+        ps.setString(1, idDonador);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            totalDonado = rs.getBigDecimal("total");
         }
     }
     
-    private void guardarNuevoDonativo() {
-        try {
-            String sql = """
-                INSERT INTO Donativo (
-                    idDonador, fechaGarantia, cantidadGarantizada,
-                    cantidadRecibida, metodoPago, numeroPagos,
-                    numeroTarjeta, idCorporacion, Observaciones
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """;
+    // 3. Calcular y actualizar el círculo basado en el total acumulado
+    String circulo = calcularCirculoDonador(totalDonado);
+    
+    String sqlActualizarCirculo = """
+        UPDATE Donador 
+        SET circuloDonador = ?
+        WHERE idDonador = ?
+        """;
+    
+    try (PreparedStatement ps = con.prepareStatement(sqlActualizarCirculo)) {
+        ps.setString(1, circulo);
+        ps.setString(2, idDonador);
+        ps.executeUpdate();
+    }
+    
+    // Opcional: Mostrar en consola el cambio
+    System.out.println("Donador " + idDonador + 
+                      " - Total donado: $" + String.format("%,.2f", totalDonado) + 
+                      " - Círculo: " + circulo);
+}
+    
+private void actualizarDonativo() {
+    int confirmacion = JOptionPane.showConfirmDialog(this,
+        "¿Actualizar donativo ID: " + txtIdDonativo.getText() + "?\n" +
+        "Nota: Esto actualizará el círculo del donador.",
+        "Confirmar actualización",
+        JOptionPane.YES_NO_OPTION);
+    
+    if (confirmacion != JOptionPane.YES_OPTION) {
+        return;
+    }
+    
+    Connection con = null;
+    try {
+        con = ConexionBD.getConexion();
+        con.setAutoCommit(false);
+        
+        // 1. Obtener el monto anterior del donativo
+        String sqlObtenerAnterior = """
+            SELECT cantidadRecibida, idDonador 
+            FROM Donativo 
+            WHERE idDonativo = ?
+            """;
+        
+        BigDecimal montoAnterior = BigDecimal.ZERO;
+        String idDonador = "";
+        
+        try (PreparedStatement ps = con.prepareStatement(sqlObtenerAnterior)) {
+            ps.setInt(1, Integer.parseInt(txtIdDonativo.getText().trim()));
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                montoAnterior = rs.getBigDecimal("cantidadRecibida");
+                idDonador = rs.getString("idDonador");
+            }
+        }
+        
+        // 2. Actualizar el donativo
+        BigDecimal nuevoMonto = new BigDecimal(txtCantidadRecibida.getText().trim());
+        String sqlActualizar = """
+            UPDATE Donativo SET
+                idDonador = ?, fechaGarantia = ?, cantidadGarantizada = ?,
+                cantidadRecibida = ?, metodoPago = ?, numeroPagos = ?,
+                numeroTarjeta = ?, idCorporacion = ?, Observaciones = ?
+            WHERE idDonativo = ?
+            """;
+        
+        try (PreparedStatement ps = con.prepareStatement(sqlActualizar)) {
+            ps.setString(1, txtIdGarantia.getText().trim());
+            ps.setString(2, convertirFechaSQL(txtFechaGarantia.getText().trim()));
+            ps.setBigDecimal(3, new BigDecimal(txtCantidadGarantizada.getText().trim()));
+            ps.setBigDecimal(4, nuevoMonto);
+            ps.setString(5, comboMetodo.getSelectedItem().toString());
+            ps.setInt(6, Integer.parseInt(comboNumPagos.getSelectedItem().toString()));
             
-            try (Connection con = ConexionBD.getConexion();
-                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            if (comboMetodo.getSelectedItem().toString().equals("Tarjeta de Crédito")) {
+                ps.setString(7, txtNumTDC.getText().trim());
+            } else {
+                ps.setString(7, null);
+            }
+            
+            CorporacionItem corp = (CorporacionItem) comboCorporacion.getSelectedItem();
+            ps.setInt(8, corp.getId());
+            
+            String observaciones = txtObservaciones.getText().trim();
+            ps.setString(9, observaciones.isEmpty() ? null : observaciones);
+            
+            ps.setInt(10, Integer.parseInt(txtIdDonativo.getText().trim()));
+            
+            int filas = ps.executeUpdate();
+            
+            if (filas > 0 && !idDonador.isEmpty()) {
+                // 3. Ajustar el total donado (nuevo - anterior)
+                BigDecimal diferencia = nuevoMonto.subtract(montoAnterior);
                 
-                // Parámetros
-                ps.setString(1, txtIdDonador.getText().trim());
-                ps.setString(2, convertirFechaSQL(txtFechaRegistro.getText().trim()));
-                ps.setBigDecimal(3, new BigDecimal(txtCantidadGarantizada.getText().trim()));
-                ps.setBigDecimal(4, new BigDecimal(txtCantidadRecibida.getText().trim()));
-                ps.setString(5, comboMetodo.getSelectedItem().toString());
-                ps.setInt(6, Integer.parseInt(comboNumPagos.getSelectedItem().toString()));
-                
-                // Número de tarjeta
-                if (comboMetodo.getSelectedItem().toString().equals("Tarjeta de Crédito")) {
-                    ps.setString(7, txtNumTDC.getText().trim());
-                } else {
-                    ps.setString(7, null);
-                }
-                
-                // Corporación
-                CorporacionItem corp = (CorporacionItem) comboCorporacion.getSelectedItem();
-                ps.setInt(8, corp.getId());
-                
-                // Observaciones
-                String observaciones = txtObservaciones.getText().trim();
-                ps.setString(9, observaciones.isEmpty() ? null : observaciones);
-                
-                int filas = ps.executeUpdate();
-                
-                if (filas > 0) {
-                    ResultSet rs = ps.getGeneratedKeys();
-                    if (rs.next()) {
-                        int idGenerado = rs.getInt(1);
-                        
-                        JOptionPane.showMessageDialog(this,
-                            "Donativo registrado exitosamente\n\n" +
-                            "ID: " + idGenerado + "\n" +
-                            "Donador: " + txtNombreDonador.getText() + "\n" +
-                            "Monto: $" + txtCantidadRecibida.getText(),
-                            "Registro exitoso",
-                            JOptionPane.INFORMATION_MESSAGE);
-                        
-                        limpiarCampos();
-                        cargarTabla();
+                if (!diferencia.equals(BigDecimal.ZERO)) {
+                    // Actualizar total donado
+                    String sqlAjustarTotal = """
+                        UPDATE Donador 
+                        SET totalDonado = ISNULL(totalDonado, 0) + ?
+                        WHERE idDonador = ?
+                        """;
+                    
+                    try (PreparedStatement ps2 = con.prepareStatement(sqlAjustarTotal)) {
+                        ps2.setBigDecimal(1, diferencia);
+                        ps2.setString(2, idDonador);
+                        ps2.executeUpdate();
+                    }
+                    
+                    // Recalcular círculo
+                    String sqlObtenerTotal = """
+                        SELECT ISNULL(totalDonado, 0) as total 
+                        FROM Donador 
+                        WHERE idDonador = ?
+                        """;
+                    
+                    BigDecimal totalDonado = BigDecimal.ZERO;
+                    try (PreparedStatement ps3 = con.prepareStatement(sqlObtenerTotal)) {
+                        ps3.setString(1, idDonador);
+                        ResultSet rs = ps3.executeQuery();
+                        if (rs.next()) {
+                            totalDonado = rs.getBigDecimal("total");
+                        }
+                    }
+                    
+                    String circulo = calcularCirculoDonador(totalDonado);
+                    
+                    String sqlActualizarCirculo = """
+                        UPDATE Donador 
+                        SET circuloDonador = ?
+                        WHERE idDonador = ?
+                        """;
+                    
+                    try (PreparedStatement ps4 = con.prepareStatement(sqlActualizarCirculo)) {
+                        ps4.setString(1, circulo);
+                        ps4.setString(2, idDonador);
+                        ps4.executeUpdate();
                     }
                 }
                 
+                con.commit();
+                
+                JOptionPane.showMessageDialog(this,
+                    "✅ Donativo actualizado exitosamente\n" +
+                    "Círculo del donador recalculado automáticamente",
+                    "Actualización exitosa",
+                    JOptionPane.INFORMATION_MESSAGE);
+                
+                limpiarCampos();
+                cargarTabla();
             }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this,
-                "Error al guardar donativo:\n" + e.getMessage(),
-                "Error BD",
-                JOptionPane.ERROR_MESSAGE);
-        }
-    }
-    
-    private void actualizarDonativo() {
-        int confirmacion = JOptionPane.showConfirmDialog(this,
-            "¿Actualizar donativo ID: " + txtIdDonativo.getText() + "?",
-            "Confirmar actualización",
-            JOptionPane.YES_NO_OPTION);
-        
-        if (confirmacion != JOptionPane.YES_OPTION) {
-            return;
         }
         
+    } catch (SQLException e) {
         try {
-            String sql = """
-                UPDATE Donativo SET
-                    idDonador = ?, fechaGarantia = ?, cantidadGarantizada = ?,
-                    cantidadRecibida = ?, metodoPago = ?, numeroPagos = ?,
-                    numeroTarjeta = ?, idCorporacion = ?, Observaciones = ?
-                WHERE idDonativo = ?
-                """;
-            
-            try (Connection con = ConexionBD.getConexion();
-                 PreparedStatement ps = con.prepareStatement(sql)) {
-                
-                // Parámetros
-                ps.setString(1, txtIdDonador.getText().trim());
-                ps.setString(2, convertirFechaSQL(txtFechaRegistro.getText().trim()));
-                ps.setBigDecimal(3, new BigDecimal(txtCantidadGarantizada.getText().trim()));
-                ps.setBigDecimal(4, new BigDecimal(txtCantidadRecibida.getText().trim()));
-                ps.setString(5, comboMetodo.getSelectedItem().toString());
-                ps.setInt(6, Integer.parseInt(comboNumPagos.getSelectedItem().toString()));
-                
-                if (comboMetodo.getSelectedItem().toString().equals("Tarjeta de Crédito")) {
-                    ps.setString(7, txtNumTDC.getText().trim());
-                } else {
-                    ps.setString(7, null);
-                }
-                
-                CorporacionItem corp = (CorporacionItem) comboCorporacion.getSelectedItem();
-                ps.setInt(8, corp.getId());
-                
-                String observaciones = txtObservaciones.getText().trim();
-                ps.setString(9, observaciones.isEmpty() ? null : observaciones);
-                
-                ps.setInt(10, Integer.parseInt(txtIdDonativo.getText().trim()));
-                
-                int filas = ps.executeUpdate();
-                
-                if (filas > 0) {
-                    JOptionPane.showMessageDialog(this,
-                        "Donativo actualizado exitosamente",
-                        "Actualización exitosa",
-                        JOptionPane.INFORMATION_MESSAGE);
-                    
-                    limpiarCampos();
-                    cargarTabla();
-                }
+            if (con != null) {
+                con.rollback();
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        
+        JOptionPane.showMessageDialog(this,
+            "Error al actualizar donativo:\n" + e.getMessage(),
+            "Error BD",
+            JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+        
+    } finally {
+        try {
+            if (con != null) {
+                con.setAutoCommit(true);
+                con.close();
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this,
-                "Error al actualizar donativo:\n" + e.getMessage(),
-                "Error BD",
-                JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }
+}
+
+
     
     private String convertirFechaSQL(String fecha) {
         try {
@@ -526,55 +700,147 @@ public class Donativos extends javax.swing.JFrame {
         }
     }
     
-    private void eliminarDonativo() {
-        int fila = tablaHistorial.getSelectedRow();
-        if (fila == -1) {
-            JOptionPane.showMessageDialog(this,
-                "Seleccione un donativo de la tabla para eliminar",
-                "Selección requerida",
-                JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        
-        int idDonativo = (int) tablaHistorial.getValueAt(fila, 0);
-        String donador = tablaHistorial.getValueAt(fila, 6).toString();
-        
-        int confirmacion = JOptionPane.showConfirmDialog(this,
-            "¿Eliminar donativo ID: " + idDonativo + "?\n\n" +
-            "Donador: " + donador + "\n\n" +
-            "Esta acción no se puede deshacer",
-            "Confirmar eliminación",
-            JOptionPane.YES_NO_OPTION,
+private void eliminarDonativo() {
+    int fila = tablaHistorial.getSelectedRow();
+    if (fila == -1) {
+        JOptionPane.showMessageDialog(this,
+            "Seleccione un donativo de la tabla para eliminar",
+            "Selección requerida",
             JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    int idDonativo = (int) tablaHistorial.getValueAt(fila, 0);
+    String donador = tablaHistorial.getValueAt(fila, 6).toString();
+    
+    int confirmacion = JOptionPane.showConfirmDialog(this,
+        "¿Eliminar donativo ID: " + idDonativo + "?\n\n" +
+        "Donador: " + donador + "\n\n" +
+        "⚠️ Esto restará el monto del total donado\n" +
+        "y recalculará el círculo del donador.\n\n" +
+        "Esta acción no se puede deshacer",
+        "Confirmar eliminación",
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.WARNING_MESSAGE);
+    
+    if (confirmacion != JOptionPane.YES_OPTION) {
+        return;
+    }
+    
+    Connection con = null;
+    try {
+        con = ConexionBD.getConexion();
+        con.setAutoCommit(false);
         
-        if (confirmacion != JOptionPane.YES_OPTION) {
-            return;
+        // 1. Obtener datos del donativo antes de eliminar
+        String sqlObtenerDatos = """
+            SELECT cantidadRecibida, idDonador 
+            FROM Donativo 
+            WHERE idDonativo = ?
+            """;
+        
+        BigDecimal montoEliminar = BigDecimal.ZERO;
+        String idDonador = "";
+        
+        try (PreparedStatement ps = con.prepareStatement(sqlObtenerDatos)) {
+            ps.setInt(1, idDonativo);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                montoEliminar = rs.getBigDecimal("cantidadRecibida");
+                idDonador = rs.getString("idDonador");
+            }
         }
         
-        String sql = "DELETE FROM Donativo WHERE idDonativo = ?";
+        // 2. Eliminar el donativo
+        String sqlEliminar = "DELETE FROM Donativo WHERE idDonativo = ?";
         
-        try (Connection con = ConexionBD.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            
+        try (PreparedStatement ps = con.prepareStatement(sqlEliminar)) {
             ps.setInt(1, idDonativo);
             int filas = ps.executeUpdate();
             
-            if (filas > 0) {
+            if (filas > 0 && !idDonador.isEmpty()) {
+                // 3. Restar del total donado
+                String sqlRestarTotal = """
+                    UPDATE Donador 
+                    SET totalDonado = ISNULL(totalDonado, 0) - ?
+                    WHERE idDonador = ?
+                    """;
+                
+                try (PreparedStatement ps2 = con.prepareStatement(sqlRestarTotal)) {
+                    ps2.setBigDecimal(1, montoEliminar);
+                    ps2.setString(2, idDonador);
+                    ps2.executeUpdate();
+                }
+                
+                // 4. Recalcular círculo
+                String sqlObtenerTotal = """
+                    SELECT ISNULL(totalDonado, 0) as total 
+                    FROM Donador 
+                    WHERE idDonador = ?
+                    """;
+                
+                BigDecimal totalDonado = BigDecimal.ZERO;
+                try (PreparedStatement ps3 = con.prepareStatement(sqlObtenerTotal)) {
+                    ps3.setString(1, idDonador);
+                    ResultSet rs = ps3.executeQuery();
+                    if (rs.next()) {
+                        totalDonado = rs.getBigDecimal("total");
+                    }
+                }
+                
+                String circulo = calcularCirculoDonador(totalDonado);
+                
+                String sqlActualizarCirculo = """
+                    UPDATE Donador 
+                    SET circuloDonador = ?
+                    WHERE idDonador = ?
+                    """;
+                
+                try (PreparedStatement ps4 = con.prepareStatement(sqlActualizarCirculo)) {
+                    ps4.setString(1, circulo);
+                    ps4.setString(2, idDonador);
+                    ps4.executeUpdate();
+                }
+                
+                con.commit();
+                
                 JOptionPane.showMessageDialog(this,
-                    "Donativo eliminado exitosamente",
+                    "✅ Donativo eliminado exitosamente\n" +
+                    "Círculo del donador actualizado automáticamente",
                     "Eliminación exitosa",
                     JOptionPane.INFORMATION_MESSAGE);
                 
                 cargarTabla();
                 cargarProximoIdDonativo();
             }
+        }
+        
+    } catch (SQLException e) {
+        try {
+            if (con != null) {
+                con.rollback();
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        
+        JOptionPane.showMessageDialog(this,
+            "Error al eliminar donativo:\n" + e.getMessage(),
+            "Error BD",
+            JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+        
+    } finally {
+        try {
+            if (con != null) {
+                con.setAutoCommit(true);
+                con.close();
+            }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this,
-                "Error al eliminar donativo:\n" + e.getMessage(),
-                "Error BD",
-                JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }
+}
     
     private void buscarDonativo() {
         String criterio = JOptionPane.showInputDialog(this,
@@ -583,67 +849,79 @@ public class Donativos extends javax.swing.JFrame {
             JOptionPane.QUESTION_MESSAGE);
         
         if (criterio != null && !criterio.trim().isEmpty()) {
-            buscarDonativoEnBD(criterio.trim());
+            buscarGarantiaEnBD(criterio.trim());
         }
     }
     
-    private void buscarDonativoEnBD(String idDonativo) {
-        String sql = """
-            SELECT D.*, DO.nombre as nombreDonador, C.nombre as nombreCorporacion
-            FROM Donativo D
-            LEFT JOIN Donador DO ON D.idDonador = DO.idDonador
-            LEFT JOIN Corporacion C ON D.idCorporacion = C.idCorporacion
-            WHERE D.idDonativo = ?
-            """;
+private void buscarGarantiaEnBD(String idGarantia) {
+    String sql = """
+        SELECT G.*, DO.nombre as nombreDonador, DO.idDonador
+        FROM Garantia G
+        LEFT JOIN Donador DO ON G.idDonador = DO.idDonador
+        WHERE G.idGarantia = ?
+        """;
+    
+    try (Connection con = ConexionBD.getConexion();
+         PreparedStatement ps = con.prepareStatement(sql)) {
         
-        try (Connection con = ConexionBD.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setInt(1, Integer.parseInt(idGarantia));
+        ResultSet rs = ps.executeQuery();
+        
+        if (rs.next()) {
+            // Autocompletar ID y nombre del donador
+            txtIdGarantia.setText(rs.getString("idDonador"));
+            txtNombreDonador.setText(rs.getString("nombreDonador"));
             
-            ps.setInt(1, Integer.parseInt(idDonativo));
-            ResultSet rs = ps.executeQuery();
-            
-            if (rs.next()) {
-                cargarDonativoEnFormulario(rs);
-                
-                JOptionPane.showMessageDialog(this,
-                    "Donativo encontrado\n\n" +
-                    "ID: " + rs.getInt("idDonativo") + "\n" +
-                    "Donador: " + rs.getString("nombreDonador"),
-                    "Búsqueda exitosa",
-                    JOptionPane.INFORMATION_MESSAGE);
-                
-                botonRegistrar.setText("Actualizar Donativo");
-            } else {
-                JOptionPane.showMessageDialog(this,
-                    "No se encontró donativo con ID: " + idDonativo,
-                    "Sin resultados",
-                    JOptionPane.INFORMATION_MESSAGE);
+            // Autocompletar fecha de garantía
+            String fechaBD = rs.getString("fechaGarantia");
+            if (fechaBD != null) {
+                try {
+                    SimpleDateFormat entrada = new SimpleDateFormat("yyyy-MM-dd");
+                    SimpleDateFormat salida = new SimpleDateFormat("dd/MM/yyyy");
+                    txtFechaGarantia.setText(salida.format(entrada.parse(fechaBD)));
+                    txtFechaGarantia.setForeground(Color.BLACK);
+                } catch (Exception e) {
+                    txtFechaGarantia.setText(fechaBD);
+                }
             }
-        } catch (SQLException | NumberFormatException e) {
+            
             JOptionPane.showMessageDialog(this,
-                "Error en búsqueda: " + e.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
+                "✅ Garantía encontrada\n\n" +
+                "ID Garantía: " + idGarantia + "\n" +
+                "Donador: " + rs.getString("nombreDonador"),
+                "Búsqueda exitosa",
+                JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this,
+                "No se encontró garantía con ID: " + idGarantia,
+                "Sin resultados",
+                JOptionPane.INFORMATION_MESSAGE);
         }
+    } catch (SQLException | NumberFormatException e) {
+        JOptionPane.showMessageDialog(this,
+            "Error en búsqueda: " + e.getMessage(),
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
     }
+}
     
     private void cargarDonativoEnFormulario(ResultSet rs) throws SQLException {
-        txtIdDonativo.setText(String.valueOf(rs.getInt("idDonativo")));
-        txtIdDonador.setText(rs.getString("idDonador"));
-        txtNombreDonador.setText(rs.getString("nombreDonador"));
-        
-        // Fecha
-        String fechaBD = rs.getString("fechaGarantia");
-        if (fechaBD != null) {
-            try {
-                SimpleDateFormat entrada = new SimpleDateFormat("yyyy-MM-dd");
-                SimpleDateFormat salida = new SimpleDateFormat("dd/MM/yyyy");
-                txtFechaRegistro.setText(salida.format(entrada.parse(fechaBD)));
-                txtFechaRegistro.setForeground(Color.BLACK);
-            } catch (Exception e) {
-                txtFechaRegistro.setText(fechaBD);
-            }
+        txtIdGarantia.setText(String.valueOf(rs.getInt("idGarantia")));
+    txtIdGarantia.setText(rs.getString("idDonador"));          // Autocompletar ID donador
+    txtNombreDonador.setText(rs.getString("nombreDonador")); // Autocompletar nombre
+    
+    // Fecha de garantía se autocompleta automáticamente
+    String fechaBD = rs.getString("fechaGarantia");
+    if (fechaBD != null) {
+        try {
+            SimpleDateFormat entrada = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat salida = new SimpleDateFormat("dd/MM/yyyy");
+            txtFechaGarantia.setText(salida.format(entrada.parse(fechaBD)));
+            txtFechaGarantia.setForeground(Color.BLACK);
+        } catch (Exception e) {
+            txtFechaGarantia.setText(fechaBD);
         }
+    }
         
         // Cantidades
         txtCantidadGarantizada.setText(rs.getBigDecimal("cantidadGarantizada").toString());
@@ -690,42 +968,85 @@ public class Donativos extends javax.swing.JFrame {
         txtObservaciones.setText(rs.getString("Observaciones"));
     }
     
-    private void editarDonativoDesdeTabla() {
-        int fila = tablaHistorial.getSelectedRow();
-        if (fila == -1) {
-            JOptionPane.showMessageDialog(this,
-                "Seleccione un donativo de la tabla para editar",
-                "Selección requerida",
-                JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        
-        int idDonativo = (int) tablaHistorial.getValueAt(fila, 0);
-        buscarDonativoEnBD(String.valueOf(idDonativo));
+private void editarDonativoDesdeTabla() {
+    int fila = tablaHistorial.getSelectedRow();
+    if (fila == -1) {
+        JOptionPane.showMessageDialog(this,
+            "Seleccione un donativo de la tabla para editar",
+            "Selección requerida",
+            JOptionPane.WARNING_MESSAGE);
+        return;
     }
     
-    private void limpiarCampos() {
-        cargarProximoIdDonativo();
-        txtIdDonador.setText("");
-        txtNombreDonador.setText("");
-        txtFechaRegistro.setText("dd/mm/aaaa");
-        txtFechaRegistro.setForeground(Color.GRAY);
-        txtCantidadGarantizada.setText("");
-        txtCantidadRecibida.setText("");
-        txtNumTDC.setText("");
-        txtObservaciones.setText("");
-        
-        comboMetodo.setSelectedIndex(0);
-        comboNumPagos.setSelectedIndex(0);
-        comboCorporacion.setSelectedIndex(0);
-        
-        txtNumTDC.setEnabled(false);
-        txtNumTDC.setBackground(new Color(240, 240, 240));
-        
-        botonRegistrar.setText("Registrar Donativo");
-        tablaHistorial.clearSelection();
-    }
+    int idDonativo = (int) tablaHistorial.getValueAt(fila, 0);
+    buscarGarantiaEnBD(String.valueOf(idDonativo));
+}
     
+ private void limpiarCampos() {
+    // SIEMPRE cargar el próximo ID para nuevo registro
+    cargarProximoIdDonativo();
+    
+    txtIdGarantia.setText("");
+    txtNombreDonador.setText("");
+    txtFechaGarantia.setText("dd/mm/aaaa");
+    txtFechaGarantia.setForeground(Color.GRAY);
+    txtCantidadGarantizada.setText("");
+    txtCantidadRecibida.setText("");
+    txtNumTDC.setText("");
+    txtObservaciones.setText("");
+    
+    comboMetodo.setSelectedIndex(0);
+    comboNumPagos.setSelectedIndex(0);
+    comboCorporacion.setSelectedIndex(0);
+    
+    txtNumTDC.setEnabled(false);
+    txtNumTDC.setBackground(new Color(240, 240, 240));
+    
+    // Asegurar que el botón dice "Registrar"
+    botonRegistrar.setText("Registrar Donativo");
+    tablaHistorial.clearSelection();
+    
+    // Restaurar colores de fondo
+    txtIdGarantia.setBackground(Color.WHITE);
+    txtFechaGarantia.setBackground(Color.WHITE);
+    txtCantidadGarantizada.setBackground(Color.WHITE);
+    txtCantidadRecibida.setBackground(Color.WHITE);
+    comboMetodo.setBackground(Color.WHITE);
+    comboNumPagos.setBackground(Color.WHITE);
+    comboCorporacion.setBackground(Color.WHITE);
+    
+}
+    
+    // Agregar este método en tu clase Donativos.java
+private String calcularCirculoDonador(BigDecimal montoDonativo) {
+    double monto = montoDonativo.doubleValue();
+    
+    if (monto >= 100000.00) {
+        return "Círculo Fundadores";
+    } else if (monto >= 50000.00) {
+        return "Círculo del Presidente";
+    } else if (monto >= 25000.00) {
+        return "Círculo Platino";
+    } else if (monto >= 10000.00) {
+        return "Círculo Oro";
+    } else if (monto >= 5000.00) {
+        return "Círculo Plata";
+    } else if (monto >= 1000.00) {
+        return "Círculo Bronce";
+    } else if (monto >= 500.00) {
+        return "Círculo Amigos";
+    } else if (monto >= 250.00) {
+        return "Círculo Contribuyente";
+    } else if (monto >= 100.00) {
+        return "Círculo Apoyo";
+    } else if (monto >= 1.00) {
+        return "Círculo Básico";
+    } else {
+        return "Sin Círculo";
+    }
+}
+
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -751,9 +1072,8 @@ public class Donativos extends javax.swing.JFrame {
         jLabel11 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tablaHistorial = new javax.swing.JTable();
-        botonVolver = new javax.swing.JButton();
         botonEliminarDonativo = new javax.swing.JButton();
-        botonBuscarDonador = new javax.swing.JButton();
+        botonBuscarGarantia = new javax.swing.JButton();
         comboMetodo = new javax.swing.JComboBox<>();
         comboNumPagos = new javax.swing.JComboBox<>();
         txtNumTDC = new javax.swing.JTextField();
@@ -765,12 +1085,15 @@ public class Donativos extends javax.swing.JFrame {
         jLabel12 = new javax.swing.JLabel();
         txtIdDonativo = new javax.swing.JTextField();
         comboCorporacion = new javax.swing.JComboBox();
-        txtIdDonador = new javax.swing.JTextField();
+        txtIdGarantia = new javax.swing.JTextField();
         txtNombreDonador = new javax.swing.JTextField();
-        jLabel13 = new javax.swing.JLabel();
-        txtFechaRegistro = new javax.swing.JTextField();
+        txtFechaGarantia = new javax.swing.JTextField();
         txtCantidadGarantizada = new javax.swing.JTextField();
         txtCantidadRecibida = new javax.swing.JTextField();
+        botonVolver = new javax.swing.JButton();
+        jLabel14 = new javax.swing.JLabel();
+        txtFechaRegistro = new javax.swing.JTextField();
+        botonGestionarPagos = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -778,16 +1101,16 @@ public class Donativos extends javax.swing.JFrame {
 
         jLabel1.setFont(new java.awt.Font("Yu Gothic", 1, 18)); // NOI18N
         jLabel1.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\folder-download.png")); // NOI18N
-        jLabel1.setText("Registro de donativo/garantia");
+        jLabel1.setText("Registro de Donativo");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(354, 354, 354)
                 .addComponent(jLabel1)
-                .addGap(167, 167, 167))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -797,9 +1120,9 @@ public class Donativos extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jLabel2.setText("Donador: ");
+        jLabel2.setText("id Garantia:");
 
-        jLabel3.setText("Fecha de registro:");
+        jLabel3.setText("Fecha de garantia:");
 
         jLabel4.setText("Cantidad garantizada:");
 
@@ -839,15 +1162,6 @@ public class Donativos extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(tablaHistorial);
 
-        botonVolver.setBackground(new java.awt.Color(102, 204, 0));
-        botonVolver.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-small-left.png")); // NOI18N
-        botonVolver.setText("Volver");
-        botonVolver.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botonVolverActionPerformed(evt);
-            }
-        });
-
         botonEliminarDonativo.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\cross.png")); // NOI18N
         botonEliminarDonativo.setText("Eliminar Donativo");
         botonEliminarDonativo.addActionListener(new java.awt.event.ActionListener() {
@@ -856,12 +1170,12 @@ public class Donativos extends javax.swing.JFrame {
             }
         });
 
-        botonBuscarDonador.setBackground(new java.awt.Color(204, 255, 153));
-        botonBuscarDonador.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\chart-tree.png")); // NOI18N
-        botonBuscarDonador.setText("Buscar Donador");
-        botonBuscarDonador.addActionListener(new java.awt.event.ActionListener() {
+        botonBuscarGarantia.setBackground(new java.awt.Color(204, 255, 153));
+        botonBuscarGarantia.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\chart-tree.png")); // NOI18N
+        botonBuscarGarantia.setText("Buscar Garantia");
+        botonBuscarGarantia.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botonBuscarDonadorActionPerformed(evt);
+                botonBuscarGarantiaActionPerformed(evt);
             }
         });
 
@@ -905,13 +1219,38 @@ public class Donativos extends javax.swing.JFrame {
 
         txtIdDonativo.setEditable(false);
 
-        txtIdDonador.setEditable(false);
+        txtIdGarantia.setEditable(false);
+        txtIdGarantia.setForeground(new java.awt.Color(204, 204, 204));
+        txtIdGarantia.setText("id de la garantia");
 
         txtNombreDonador.setEditable(false);
+        txtNombreDonador.setBackground(new java.awt.Color(255, 255, 255));
+        txtNombreDonador.setForeground(new java.awt.Color(204, 204, 204));
+        txtNombreDonador.setText("Nombre del donador");
 
-        jLabel13.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel13.setForeground(new java.awt.Color(153, 153, 153));
-        jLabel13.setText("dd/mm/aaaa");
+        txtFechaGarantia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtFechaGarantiaActionPerformed(evt);
+            }
+        });
+
+        botonVolver.setBackground(new java.awt.Color(102, 204, 0));
+        botonVolver.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-small-left.png")); // NOI18N
+        botonVolver.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonVolverActionPerformed(evt);
+            }
+        });
+
+        jLabel14.setText("Fecha de registro del donativo: ");
+
+        botonGestionarPagos.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\money (1).png")); // NOI18N
+        botonGestionarPagos.setText("Gestionar Pagos");
+        botonGestionarPagos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonGestionarPagosActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -919,159 +1258,159 @@ public class Donativos extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addGap(14, 14, 14)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel12)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel11)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel3)
-                                        .addGap(58, 58, 58)
-                                        .addComponent(txtFechaRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addGap(12, 12, 12)
-                        .addComponent(botonVolver))
+                        .addComponent(jScrollPane1)
+                        .addGap(150, 150, 150))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel11)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(14, 14, 14)
-                                        .addComponent(botonRegistrar))
+                                    .addComponent(jLabel6)
+                                    .addComponent(jLabel4)
+                                    .addComponent(jLabel5)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel12)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jLabel8)
                                     .addComponent(jLabel10))
-                                .addGap(18, 18, 18)
-                                .addComponent(botonEliminarDonativo)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
-                                .addComponent(botonBuscarDonativo)
-                                .addGap(18, 18, 18)
-                                .addComponent(botonEditarDonativo))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jLabel6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(botonLimpiar))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGap(44, 44, 44)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtNumTDC, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtIdDonativo, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(comboCorporacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(comboNumPagos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtCantidadRecibida, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtCantidadGarantizada, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(comboMetodo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel2)
-                                        .addGap(98, 98, 98)
-                                        .addComponent(txtIdDonador, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(txtNombreDonador))
+                                        .addComponent(txtFechaGarantia, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(34, 34, 34)
+                                        .addComponent(jLabel14)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(txtFechaRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel7)
-                                            .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jLabel9)
-                                                .addGap(18, 18, 18)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                    .addComponent(comboCorporacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                            .addGroup(layout.createSequentialGroup()
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                    .addComponent(jLabel5)
-                                                    .addComponent(jLabel4)
-                                                    .addComponent(jLabel8))
-                                                .addGap(36, 36, 36)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                    .addComponent(txtNumTDC, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                    .addGroup(layout.createSequentialGroup()
-                                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                            .addComponent(comboMetodo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                            .addComponent(comboNumPagos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                            .addComponent(txtIdDonativo, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                        .addGap(35, 35, 35)
-                                                        .addComponent(jLabel13))
-                                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                                        .addComponent(txtCantidadGarantizada, javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(txtCantidadRecibida, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)))))
-                                        .addGap(0, 50, Short.MAX_VALUE)))
-                                .addGap(18, 18, 18)
-                                .addComponent(botonBuscarDonador)))
-                        .addContainerGap())))
+                                        .addComponent(txtIdGarantia, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(txtNombreDonador, javax.swing.GroupLayout.PREFERRED_SIZE, 347, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(44, 44, 44)
+                                        .addComponent(botonBuscarGarantia))))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(8, 8, 8)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel9)
+                                    .addComponent(jLabel7))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(botonRegistrar, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(botonEliminarDonativo, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(botonBuscarDonativo, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(botonLimpiar, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(botonEditarDonativo, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(botonGestionarPagos, javax.swing.GroupLayout.Alignment.TRAILING))))
+                .addGap(24, 24, 24)
+                .addComponent(botonVolver))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(3, 3, 3)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel12)
-                    .addComponent(txtIdDonativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(botonBuscarDonador)
-                    .addComponent(txtIdDonador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtNombreDonador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel13)
-                    .addComponent(txtFechaRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(txtCantidadGarantizada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(txtCantidadRecibida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(botonLimpiar)
-                    .addComponent(jLabel6)
-                    .addComponent(comboMetodo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(comboNumPagos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel8)
-                    .addComponent(txtNumTDC, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(24, 24, 24)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel9)
-                    .addComponent(comboCorporacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel10))
-                .addGap(30, 30, 30)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(botonRegistrar)
-                    .addComponent(botonEliminarDonativo)
-                    .addComponent(botonBuscarDonativo)
-                    .addComponent(botonEditarDonativo))
-                .addGap(16, 16, 16)
-                .addComponent(jLabel11)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(botonVolver)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(botonVolver))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel12)
+                            .addComponent(txtIdDonativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(14, 14, 14)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(txtIdGarantia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtNombreDonador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(botonBuscarGarantia))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel3)
+                            .addComponent(txtFechaGarantia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel14)
+                            .addComponent(txtFechaRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(botonRegistrar))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel4)
+                                    .addComponent(txtCantidadGarantizada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(33, 33, 33)
+                                .addComponent(botonEliminarDonativo)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel5)
+                                    .addComponent(txtCantidadRecibida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(7, 7, 7)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel6)
+                                    .addComponent(comboMetodo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(26, 26, 26)
+                                .addComponent(botonBuscarDonativo)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(comboNumPagos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(botonEditarDonativo))
+                        .addGap(5, 5, 5)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel8)
+                            .addComponent(txtNumTDC, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel9)
+                                    .addComponent(comboCorporacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(1, 1, 1)
+                                .addComponent(botonLimpiar)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel10))
+                                .addGap(28, 28, 28))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(19, 19, 19)
+                                .addComponent(botonGestionarPagos)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(jLabel11)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void botonBuscarDonadorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonBuscarDonadorActionPerformed
+    private void botonBuscarGarantiaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonBuscarGarantiaActionPerformed
   String idBuscado = JOptionPane.showInputDialog(
         this,
-        "Ingrese el ID del donador:",
-        "Buscar Donador",
+        "Ingrese el ID de la garantía:",
+        "Buscar Garantía",
         JOptionPane.QUESTION_MESSAGE
     );
     
     if (idBuscado != null) {
         idBuscado = idBuscado.trim();
         if (!idBuscado.isEmpty()) {
-            buscarDonadorEnBD(idBuscado);
+            buscarGarantiaEnBD(idBuscado);
         } else {
             JOptionPane.showMessageDialog(this, 
                 "Debe ingresar un ID para buscar", 
@@ -1079,12 +1418,13 @@ public class Donativos extends javax.swing.JFrame {
                 JOptionPane.WARNING_MESSAGE);
         }
     }
-    }//GEN-LAST:event_botonBuscarDonadorActionPerformed
+    }//GEN-LAST:event_botonBuscarGarantiaActionPerformed
 
+    
     private void botonVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonVolverActionPerformed
-        MenuPrincipal menu = new MenuPrincipal();   
-    menu.setVisible(true);
-    this.dispose();   
+        DonativosYPagos d = new DonativosYPagos();
+        d.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_botonVolverActionPerformed
 
     private void botonLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonLimpiarActionPerformed
@@ -1110,6 +1450,16 @@ public class Donativos extends javax.swing.JFrame {
     private void botonBuscarDonativoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonBuscarDonativoActionPerformed
         buscarDonativo();
     }//GEN-LAST:event_botonBuscarDonativoActionPerformed
+
+    private void txtFechaGarantiaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFechaGarantiaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtFechaGarantiaActionPerformed
+
+    private void botonGestionarPagosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonGestionarPagosActionPerformed
+        Pagos p = new Pagos();
+        p.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_botonGestionarPagosActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1137,10 +1487,11 @@ public class Donativos extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton botonBuscarDonador;
     private javax.swing.JButton botonBuscarDonativo;
+    private javax.swing.JButton botonBuscarGarantia;
     private javax.swing.JButton botonEditarDonativo;
     private javax.swing.JButton botonEliminarDonativo;
+    private javax.swing.JButton botonGestionarPagos;
     private javax.swing.JButton botonLimpiar;
     private javax.swing.JButton botonRegistrar;
     private javax.swing.JButton botonVolver;
@@ -1151,7 +1502,7 @@ public class Donativos extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -1167,9 +1518,10 @@ public class Donativos extends javax.swing.JFrame {
     private javax.swing.JTable tablaHistorial;
     private javax.swing.JTextField txtCantidadGarantizada;
     private javax.swing.JTextField txtCantidadRecibida;
+    private javax.swing.JTextField txtFechaGarantia;
     private javax.swing.JTextField txtFechaRegistro;
-    private javax.swing.JTextField txtIdDonador;
     private javax.swing.JTextField txtIdDonativo;
+    private javax.swing.JTextField txtIdGarantia;
     private javax.swing.JTextField txtNombreDonador;
     private javax.swing.JTextField txtNumTDC;
     private javax.swing.JTextArea txtObservaciones;

@@ -30,8 +30,7 @@ public class Donadores extends javax.swing.JFrame {
         cargarTabla();
         configurarspinnerAñoGraduacion();
         
-        spinnerAñoGraduacion.setEnabled(false);
-    spinnerAñoGraduacion.setBackground(Color.LIGHT_GRAY);
+     
      botonEditar.setEnabled(false);
     
     tablaListaDonadores.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -132,11 +131,6 @@ private void cargarCategorias() {
             String nombre = rs.getString("nombre");
             combCategoria.addItem(new CategoriaItem(id, nombre));
         }
-        combCategoria.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                controlarSpinnerGraduacion();
-            }
-        });
 
     } catch (SQLException e) {
         JOptionPane.showMessageDialog(this, "Error al cargar categorías: " + e.getMessage());
@@ -144,19 +138,7 @@ private void cargarCategorias() {
     }
 }
 
-private void controlarSpinnerGraduacion() {
-    CategoriaItem categoria = (CategoriaItem) combCategoria.getSelectedItem();
-    if (categoria != null && categoria.getNombre().toLowerCase().contains("graduado")) {
-        spinnerAñoGraduacion.setEnabled(true);
-        spinnerAñoGraduacion.setBackground(Color.WHITE);
-    } else {
-        spinnerAñoGraduacion.setEnabled(false);
-        spinnerAñoGraduacion.setBackground(Color.LIGHT_GRAY);
-        spinnerAñoGraduacion.setValue(0); 
-    }
-}
- 
-private boolean validarCamposObligatorios() {
+ private boolean validarCamposObligatorios() {
     StringBuilder errores = new StringBuilder();
     boolean hayErrores = false;
     
@@ -165,8 +147,8 @@ private boolean validarCamposObligatorios() {
     combCategoria.setBackground(Color.WHITE);
     txtTelefono.setBackground(Color.WHITE);
     txtCorreo.setBackground(Color.WHITE);
-    comboCorporacion.setBackground(Color.WHITE);
     txtIdDonador.setBackground(Color.WHITE);
+    // NO validar comboCorporacion aquí
 
     String idDonador = txtIdDonador.getText().trim();
     if (idDonador.isEmpty() || idDonador.contains("Presiona") || idDonador.contains("DON")) {
@@ -175,14 +157,12 @@ private boolean validarCamposObligatorios() {
         hayErrores = true;
     }
 
-
     String nombre = txtNombre.getText().trim();
     if (nombre.isEmpty()) {
         errores.append("• El nombre es obligatorio\n");
         txtNombre.setBackground(new Color(255, 200, 200));
         hayErrores = true;
     }
-
 
     String direccion = txtDireccion.getText().trim();
     if (direccion.isEmpty()) {
@@ -191,13 +171,11 @@ private boolean validarCamposObligatorios() {
         hayErrores = true;
     }
 
-
     if (combCategoria.getSelectedIndex() <= 0) {
         errores.append("• Debe seleccionar una categoría\n");
         combCategoria.setBackground(new Color(255, 200, 200));
         hayErrores = true;
     } else {
-
         CategoriaItem categoria = (CategoriaItem) combCategoria.getSelectedItem();
         if (categoria.getNombre().toLowerCase().contains("alumno")) {
             int año = (Integer) spinnerAñoGraduacion.getValue();
@@ -209,14 +187,12 @@ private boolean validarCamposObligatorios() {
         }
     }
 
-
     String telefono = txtTelefono.getText().trim();
     if (telefono.isEmpty() || telefono.equals("(  )    -")) {
         errores.append("• El teléfono es obligatorio\n");
         txtTelefono.setBackground(new Color(255, 200, 200));
         hayErrores = true;
     } else {
-
         String soloNumeros = telefono.replaceAll("[^0-9]", "");
         if (soloNumeros.length() < 8) {
             errores.append("• Teléfono debe tener al menos 8 dígitos\n");
@@ -224,7 +200,6 @@ private boolean validarCamposObligatorios() {
             hayErrores = true;
         }
     }
-
 
     String email = txtCorreo.getText().trim();
     if (!email.isEmpty()) {
@@ -235,14 +210,8 @@ private boolean validarCamposObligatorios() {
         }
     }
 
-
-    if (comboCorporacion.getSelectedIndex() <= 0) {
-        errores.append("• Debe seleccionar una corporación\n");
-        comboCorporacion.setBackground(new Color(255, 200, 200));
-        hayErrores = true;
-    }
-
-
+    // NO VALIDAR CORPORACIÓN - ES OPCIONAL
+    
     if (hayErrores) {
         JOptionPane.showMessageDialog(this, 
             "Por favor complete los siguientes campos:\n\n" + errores.toString(), 
@@ -398,14 +367,12 @@ private void cargarTabla() {
     }
      
 
-  private void agregarDonador() {
-
+private void agregarDonador() {
     if (!validarCamposObligatorios()) {
         return;
     }
 
     try {
-
         String idDonador = txtIdDonador.getText().trim();
         String nombre = txtNombre.getText().trim();
         String direccion = txtDireccion.getText().trim();
@@ -418,15 +385,13 @@ private void cargarTabla() {
             añoGraduacion = 0;
         }
         
-
         String telefono = txtTelefono.getText().trim().replaceAll("[^0-9]", "");
         String email = txtCorreo.getText().trim();
         String conyuge = txtConyuge.getText().trim();
         
-
+        // OBTENER CORPORACIÓN
         CorporacionItem corporacion = (CorporacionItem) comboCorporacion.getSelectedItem();
         
-
         String sql = """
             INSERT INTO Donador 
             (idDonador, nombre, direccion, idCategoria, anioGraduacion, 
@@ -442,7 +407,6 @@ private void cargarTabla() {
             ps.setString(3, direccion);
             ps.setInt(4, categoria.getId());
             
-
             if (añoGraduacion > 0) {
                 ps.setInt(5, añoGraduacion);
             } else {
@@ -451,7 +415,14 @@ private void cargarTabla() {
             
             ps.setString(6, telefono);
             ps.setString(7, email.isEmpty() ? null : email);
-            ps.setInt(8, corporacion.getId());
+            
+            // IMPORTANTE: Solo insertar idCorporacion si es mayor a 0
+            if (corporacion != null && corporacion.getId() > 0) {
+                ps.setInt(8, corporacion.getId());
+            } else {
+                ps.setNull(8, java.sql.Types.INTEGER); // NULL si no seleccionó
+            }
+            
             ps.setString(9, conyuge.isEmpty() ? null : conyuge);
             
             int filasAfectadas = ps.executeUpdate();
@@ -461,7 +432,8 @@ private void cargarTabla() {
                     "Donador registrado exitosamente!\n\n" +
                     "ID: " + idDonador + "\n" +
                     "Nombre: " + nombre + "\n" +
-                    "Categoría: " + categoria.getNombre(), 
+                    "Categoría: " + categoria.getNombre() + 
+                    (corporacion.getId() > 0 ? "\nCorporación: " + corporacion.getNombre() : ""), 
                     "Registro exitoso", 
                     JOptionPane.INFORMATION_MESSAGE);
                 
@@ -536,48 +508,6 @@ private void eliminarDonador() {
             e.printStackTrace();
         }
     }
-}
-
-
-private boolean tieneDonativosAsociados(String idDonador) {
-    String sql = "SELECT COUNT(*) FROM Donativo WHERE idDonador = ?";
-    
-    try (Connection con = ConexionBD.getConexion();
-         PreparedStatement ps = con.prepareStatement(sql)) {
-        
-        ps.setString(1, idDonador);
-        ResultSet rs = ps.executeQuery();
-        
-        if (rs.next()) {
-            return rs.getInt(1) > 0;
-        }
-        
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-    
-    return false;
-}
-
-
-private boolean tienePagosAsociados(String idDonador) {
-    String sql = "SELECT COUNT(*) FROM Pago WHERE idDonador = ?";
-    
-    try (Connection con = ConexionBD.getConexion();
-         PreparedStatement ps = con.prepareStatement(sql)) {
-        
-        ps.setString(1, idDonador);
-        ResultSet rs = ps.executeQuery();
-        
-        if (rs.next()) {
-            return rs.getInt(1) > 0;
-        }
-        
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-    
-    return false;
 }
 
 private void buscarDonador(String criterio) {
@@ -730,7 +660,6 @@ private void actualizarDonadorEnBD(String idDonador) {
     try (Connection con = ConexionBD.getConexion();
          PreparedStatement ps = con.prepareStatement(sql)) {
         
-
         String nombre = txtNombre.getText().trim();
         String direccion = txtDireccion.getText().trim();
         CategoriaItem categoria = (CategoriaItem) combCategoria.getSelectedItem();
@@ -740,12 +669,10 @@ private void actualizarDonadorEnBD(String idDonador) {
         String conyuge = txtConyuge.getText().trim();
         CorporacionItem corporacion = (CorporacionItem) comboCorporacion.getSelectedItem();
         
-
         ps.setString(1, nombre);
         ps.setString(2, direccion);
         ps.setInt(3, categoria.getId());
         
-
         if (añoGraduacion > 0) {
             ps.setInt(4, añoGraduacion);
         } else {
@@ -755,11 +682,11 @@ private void actualizarDonadorEnBD(String idDonador) {
         ps.setString(5, telefono);
         ps.setString(6, email.isEmpty() ? null : email);
         
-
+        // IMPORTANTE: Solo actualizar idCorporacion si es mayor a 0
         if (corporacion != null && corporacion.getId() > 0) {
             ps.setInt(7, corporacion.getId());
         } else {
-            ps.setNull(7, java.sql.Types.INTEGER);
+            ps.setNull(7, java.sql.Types.INTEGER); // NULL si no seleccionó
         }
         
         ps.setString(8, conyuge.isEmpty() ? null : conyuge);
@@ -773,11 +700,9 @@ private void actualizarDonadorEnBD(String idDonador) {
                 "Actualización exitosa", 
                 JOptionPane.INFORMATION_MESSAGE);
             
-
             cargarTabla();
             limpiarCampos();
             
-
             botonAgregar.setEnabled(true);
             botonEditar.setEnabled(false);
             
@@ -796,7 +721,6 @@ private void actualizarDonadorEnBD(String idDonador) {
         e.printStackTrace();
     }
 }
-
 private void limpiarCampos() {
     txtIdDonador.setText("Presiona Generar ID");
     txtIdDonador.setForeground(Color.GRAY);
@@ -824,21 +748,19 @@ private void limpiarCampos() {
     txtCorreo.setText("");
     txtCorreo.setBackground(Color.WHITE);
     
+    // Limpiar corporación pero SIN poner fondo rojo
     if (comboCorporacion != null) {
         comboCorporacion.setSelectedIndex(0);
-        comboCorporacion.setBackground(Color.WHITE);
+        comboCorporacion.setBackground(Color.WHITE); // Color normal
     }
     
     txtConyuge.setText("");
     
-
     botonAgregar.setEnabled(true);
     botonEditar.setEnabled(false);
     
-
     tablaListaDonadores.clearSelection();
     
-
     txtNombre.requestFocus();
 }
     /**
@@ -924,7 +846,7 @@ private void limpiarCampos() {
         jLabel11.setText("Conyuge: ");
 
         botonBuscar.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\search-alt.png")); // NOI18N
-        botonBuscar.setText("Buscar");
+        botonBuscar.setText("Buscar donador");
         botonBuscar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 botonBuscarActionPerformed(evt);
@@ -932,7 +854,7 @@ private void limpiarCampos() {
         });
 
         botonEditar.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\edit.png")); // NOI18N
-        botonEditar.setText("Editar");
+        botonEditar.setText("Editar donador");
         botonEditar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 botonEditarActionPerformed(evt);
@@ -940,7 +862,7 @@ private void limpiarCampos() {
         });
 
         botonEliminar.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\cross.png")); // NOI18N
-        botonEliminar.setText("Eliminar");
+        botonEliminar.setText("Eliminar donador");
         botonEliminar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 botonEliminarActionPerformed(evt);
@@ -977,7 +899,7 @@ private void limpiarCampos() {
         }
 
         botonAgregar.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\check.png")); // NOI18N
-        botonAgregar.setText("Agregar");
+        botonAgregar.setText("Agregar Donador");
         botonAgregar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 botonAgregarActionPerformed(evt);
@@ -986,7 +908,6 @@ private void limpiarCampos() {
 
         botonVolver.setBackground(new java.awt.Color(51, 204, 0));
         botonVolver.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-small-left.png")); // NOI18N
-        botonVolver.setText("Volver");
         botonVolver.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 botonVolverActionPerformed(evt);
@@ -1033,28 +954,28 @@ private void limpiarCampos() {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(botonVolver))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel1)
-                                .addComponent(jLabel3)
-                                .addComponent(jLabel8)
-                                .addComponent(jLabel14)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jLabel6)
-                                    .addGap(50, 50, 50)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(txtDireccion, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(combCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(txtIdDonador, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addGap(38, 38, 38)
-                                            .addComponent(botonGenerarId))
-                                        .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel8)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel6)
+                                            .addComponent(jLabel3)
+                                            .addComponent(jLabel1))
+                                        .addGap(50, 50, 50)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(txtDireccion, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(combCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addComponent(txtIdDonador, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(botonGenerarId)))))
+                                .addGap(71, 71, 71))
                             .addComponent(jLabel10)
                             .addComponent(jLabel11)
                             .addGroup(layout.createSequentialGroup()
@@ -1070,85 +991,96 @@ private void limpiarCampos() {
                                     .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(txtConyuge, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(comboCorporacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addComponent(jLabel12))
+                            .addComponent(jLabel12)
+                            .addComponent(jLabel14))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(2, 2, 2)
+                                .addComponent(botonLimpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 75, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(2, 2, 2)
-                                        .addComponent(botonLimpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(botonVolver, javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(botonAgregar)))
-                                .addComponent(botonEliminar, javax.swing.GroupLayout.Alignment.TRAILING))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(botonEditar)
-                                .addComponent(botonBuscar)))
-                        .addContainerGap())))
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                            .addComponent(botonBuscar)
+                                            .addComponent(botonEditar)
+                                            .addComponent(botonEliminar)
+                                            .addComponent(botonAgregar))
+                                        .addGap(33, 33, 33))))))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(botonAgregar)
-                    .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(9, 9, 9)
+                        .addGap(27, 27, 27)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel14)
-                            .addComponent(txtIdDonador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(botonGenerarId))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(txtDireccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel6)
-                            .addComponent(combCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel1))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel14)
+                                    .addComponent(txtIdDonador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(botonGenerarId))
+                                .addGap(20, 20, 20)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(botonEliminar)
+                                    .addComponent(jLabel3)))
+                            .addComponent(txtDireccion, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(16, 16, 16)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(combCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(botonBuscar))
+                                .addGap(12, 12, 12))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel6)
+                                .addGap(18, 18, 18))))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(botonEliminar)
-                        .addGap(18, 18, 18)
-                        .addComponent(botonBuscar)))
-                .addGap(13, 13, 13)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(spinnerAñoGraduacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(botonEditar))
-                .addGap(24, 24, 24)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel8)
-                    .addComponent(txtTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(15, 15, 15)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel9)
-                    .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                        .addGap(34, 34, 34)
+                        .addComponent(botonAgregar)
+                        .addGap(127, 127, 127)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(comboCorporacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel10))
-                        .addGap(35, 35, 35))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(botonLimpiar)
-                        .addGap(16, 16, 16)))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
+                            .addComponent(jLabel7)
+                            .addComponent(spinnerAñoGraduacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(24, 24, 24)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel8)
+                            .addComponent(txtTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(15, 15, 15)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel9)
+                            .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(comboCorporacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel10))
+                                .addGap(35, 35, 35))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(botonLimpiar)
+                                .addGap(16, 16, 16)))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel11)
                             .addComponent(txtConyuge, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addComponent(jLabel12)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(botonVolver))
-                .addContainerGap())
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(botonEditar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(botonVolver))))
         );
 
         pack();
@@ -1178,8 +1110,8 @@ private void limpiarCampos() {
     }//GEN-LAST:event_txtNombreActionPerformed
 
     private void botonVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonVolverActionPerformed
-       MenuPrincipal menu = new MenuPrincipal();   
-    menu.setVisible(true);
+       GestionPrincipal gestion = new GestionPrincipal();
+    gestion.setVisible(true);
     this.dispose();      
     }//GEN-LAST:event_botonVolverActionPerformed
 
@@ -1310,19 +1242,27 @@ class CategoriaItem {
     }
 }
 
+// Revisa cómo está definida tu clase CorporacionItem
 class CorporacionItem {
     private int id;
     private String nombre;
-
+    
     public CorporacionItem(int id, String nombre) {
         this.id = id;
         this.nombre = nombre;
     }
-
-    public int getId() { return id; }
+    
+    public int getId() { 
+        return id; 
+    }
+    
+    // Asegúrate de tener este método
+    public String getNombre() { 
+        return nombre; 
+    }
     
     @Override
     public String toString() {
-        return nombre;
+        return nombre; // Esto es lo que muestra el ComboBox
     }
 }
