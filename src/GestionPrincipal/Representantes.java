@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package universidadbeta_escritorio;
+package GestionPrincipal;
 
+import GestionPrincipal.GestionPrincipal;
 import java.awt.Color;
 import java.beans.Statement;
 import java.sql.Connection;
@@ -26,6 +27,7 @@ public class Representantes extends javax.swing.JFrame {
      */
 public Representantes() {
     initComponents();
+    setLocationRelativeTo(null);
     this.getContentPane().setBackground(new Color(182, 197, 179));
     cargarGeneraciones();
     cargarTabla();

@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package universidadbeta_escritorio;
+package GestionPrincipal;
 
+import GestionPrincipal.GestionPrincipal;
 import util.ConexionBD;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -27,6 +28,7 @@ public class Corporacion extends javax.swing.JFrame {
      */
     public Corporacion(){
     initComponents();
+    setLocationRelativeTo(null);
     
     if (tablaCorporaciones != null) {
         tablaCorporaciones.addMouseListener(new java.awt.event.MouseAdapter() {
