@@ -464,9 +464,6 @@
     <Component class="javax.swing.JTextField" name="txtIdDonador">
       <Properties>
         <Property name="editable" type="boolean" value="false"/>
-        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-          <Color blue="cc" green="cc" red="cc" type="rgb"/>
-        </Property>
         <Property name="text" type="java.lang.String" value="id del donador"/>
       </Properties>
     </Component>
@@ -475,9 +472,6 @@
         <Property name="editable" type="boolean" value="false"/>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="ff" green="ff" red="ff" type="rgb"/>
-        </Property>
-        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-          <Color blue="cc" green="cc" red="cc" type="rgb"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Nombre del donador"/>
       </Properties>

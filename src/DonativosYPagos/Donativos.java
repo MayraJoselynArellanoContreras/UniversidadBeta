@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package universidadbeta_escritorio;
+package DonativosYPagos;
 
+import DonativosYPagos.DonativosYPagos;
 import java.awt.Color;
 import java.math.BigDecimal;
 import javax.swing.JOptionPane;
@@ -28,7 +29,8 @@ public class Donativos extends javax.swing.JFrame {
      * Creates new form Donativos
      */
     public Donativos() {
-           initComponents();
+        initComponents();
+        setLocationRelativeTo(null);
         cargarMetodosPago();
         cargarNumeroPagos();
         cargarCorporaciones();
@@ -1220,12 +1222,10 @@ private String calcularCirculoDonador(BigDecimal montoDonativo) {
         txtIdDonativo.setEditable(false);
 
         txtIdGarantia.setEditable(false);
-        txtIdGarantia.setForeground(new java.awt.Color(204, 204, 204));
         txtIdGarantia.setText("id de la garantia");
 
         txtNombreDonador.setEditable(false);
         txtNombreDonador.setBackground(new java.awt.Color(255, 255, 255));
-        txtNombreDonador.setForeground(new java.awt.Color(204, 204, 204));
         txtNombreDonador.setText("Nombre del donador");
 
         txtFechaGarantia.addActionListener(new java.awt.event.ActionListener() {

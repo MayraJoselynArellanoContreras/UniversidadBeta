@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package universidadbeta_escritorio;
+package DonativosYPagos;
 
+import DonativosYPagos.DonativosYPagos;
 import java.awt.Color;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -31,6 +32,7 @@ public class Garantias extends javax.swing.JFrame {
      */
     public Garantias() {
   initComponents();
+  setLocationRelativeTo(null);
     cargarMetodosPago();
     cargarNumeroPagos();
     cargarCorporaciones();
@@ -1244,12 +1246,10 @@ private String calcularCirculoDonador(BigDecimal montoDonativo) {
         txtIdGarantia.setEditable(false);
 
         txtIdDonador.setEditable(false);
-        txtIdDonador.setForeground(new java.awt.Color(204, 204, 204));
         txtIdDonador.setText("id del donador");
 
         txtNombreDonador.setEditable(false);
         txtNombreDonador.setBackground(new java.awt.Color(255, 255, 255));
-        txtNombreDonador.setForeground(new java.awt.Color(204, 204, 204));
         txtNombreDonador.setText("Nombre del donador");
 
         jLabel13.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
