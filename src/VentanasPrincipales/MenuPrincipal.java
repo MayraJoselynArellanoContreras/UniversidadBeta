@@ -2,9 +2,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package universidadbeta_escritorio;
+package VentanasPrincipales;
 
+import VentanasPrincipales.Login;
+import GestionPrincipal.GestionPrincipal;
 import java.awt.Color;
+import Configuraciones.Configuraciones;
+import Actividades.actividades;
+import DonativosYPagos.DonativosYPagos;
 
 /**
  *
@@ -19,6 +24,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
      */
     public MenuPrincipal() {
         initComponents();
+        setLocationRelativeTo(null);
         this.getContentPane().setBackground(new Color(224, 224, 224));
     }
 
@@ -97,6 +103,11 @@ public class MenuPrincipal extends javax.swing.JFrame {
         botonEventos.setBackground(new java.awt.Color(0, 204, 204));
         botonEventos.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\angle-right.png")); // NOI18N
         botonEventos.setText("Entrar");
+        botonEventos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonEventosActionPerformed(evt);
+            }
+        });
 
         jLabel11.setFont(new java.awt.Font("Yu Gothic", 1, 12)); // NOI18N
         jLabel11.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\coins.png")); // NOI18N
@@ -113,7 +124,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         jLabel12.setFont(new java.awt.Font("Yu Gothic", 1, 12)); // NOI18N
         jLabel12.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\id-badge.png")); // NOI18N
-        jLabel12.setText("Eventos y comunicacion");
+        jLabel12.setText("Eventos y actividades");
 
         botonConfig.setBackground(new java.awt.Color(153, 153, 153));
         botonConfig.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\angle-right.png")); // NOI18N
@@ -196,7 +207,9 @@ public class MenuPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_botonCerrarSesionActionPerformed
 
     private void botonGestionPagosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonGestionPagosActionPerformed
-        // TODO add your handling code here:
+        DonativosYPagos d = new DonativosYPagos();
+        d.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_botonGestionPagosActionPerformed
 
     private void botonGestionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonGestionActionPerformed
@@ -210,6 +223,12 @@ public class MenuPrincipal extends javax.swing.JFrame {
        config.setVisible(true);
        this.dispose();
     }//GEN-LAST:event_botonConfigActionPerformed
+
+    private void botonEventosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonEventosActionPerformed
+        actividades a = new actividades();
+        a.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_botonEventosActionPerformed
 
     /**
      * @param args the command line arguments
