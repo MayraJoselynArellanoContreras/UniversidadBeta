@@ -1,4 +1,4 @@
-package universidadbeta_escritorio;
+package Configuraciones;
 
 
 import javax.swing.*;
@@ -25,7 +25,9 @@ public class CirculoDonador extends javax.swing.JFrame {
      * Creates new form CirculoDonador
      */
     public CirculoDonador() {
+        
         initComponents();
+        setLocationRelativeTo(null);
          cargarTabla();
         botonEditar.setEnabled(false);
 
@@ -714,6 +716,11 @@ private void buscarCirculoPorID(String idCirculo) {
         });
 
         botonVolver.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-small-left.png")); // NOI18N
+        botonVolver.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonVolverActionPerformed(evt);
+            }
+        });
 
         jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel7.setText("Lista de circulos existentes");
@@ -820,6 +827,12 @@ private void buscarCirculoPorID(String idCirculo) {
     private void botonLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonLimpiarActionPerformed
         limpiarCampos();
     }//GEN-LAST:event_botonLimpiarActionPerformed
+
+    private void botonVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonVolverActionPerformed
+       Configuraciones c = new Configuraciones();
+        c.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_botonVolverActionPerformed
 
     /**
      * @param args the command line arguments

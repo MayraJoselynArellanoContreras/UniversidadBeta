@@ -2,7 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package universidadbeta_escritorio;
+package Configuraciones;
+
+import VentanasPrincipales.MenuPrincipal;
 
 /**
  *
@@ -17,6 +19,7 @@ public class Reportes extends javax.swing.JFrame {
      */
     public Reportes() {
         initComponents();
+        setLocationRelativeTo(null);
     }
 
     /**
@@ -67,7 +70,7 @@ public class Reportes extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(14, 14, 14)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1)
                     .addComponent(jLabel2))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -108,8 +111,8 @@ public class Reportes extends javax.swing.JFrame {
 
         jLabel7.setText("Lista de Representantes");
 
-        botonVolver.setBackground(new java.awt.Color(51, 204, 0));
-        botonVolver.setText("Volver");
+        botonVolver.setBackground(new java.awt.Color(0, 153, 0));
+        botonVolver.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-small-left.png")); // NOI18N
         botonVolver.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 botonVolverActionPerformed(evt);
@@ -174,7 +177,7 @@ public class Reportes extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(botonRepresentantes)
                     .addComponent(jLabel7))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
                 .addComponent(botonVolver))
         );
 
@@ -190,9 +193,9 @@ public class Reportes extends javax.swing.JFrame {
     }//GEN-LAST:event_botonReporteMensualActionPerformed
 
     private void botonVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonVolverActionPerformed
-        MenuPrincipal menu = new MenuPrincipal();   
-    menu.setVisible(true);
-    this.dispose(); 
+        Configuraciones c = new Configuraciones();
+        c.setVisible(true);
+        this.dispose(); 
     }//GEN-LAST:event_botonVolverActionPerformed
 
     /**
