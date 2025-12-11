@@ -31,6 +31,56 @@ public Representantes() {
     this.getContentPane().setBackground(new Color(182, 197, 179));
     cargarGeneraciones();
     cargarTabla();
+    // ======================================
+// ORDEN PERSONALIZADO DE TABULACIÓN
+// ======================================
+java.util.List<java.awt.Component> ordenTab = java.util.Arrays.asList(
+        txtIdRepresentante,
+        txtNombre,
+        comboGeneracion,
+        txtTelefono,
+        txtEmail,
+        botonAgregar,
+        botonEditar,
+        botonEliminar,
+        botonBuscar,
+        botonLimpiar,
+        botonVolver,       // si no existe, eliminar esta línea
+        tablaRepresentantes
+);
+
+this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
+
+    @Override
+    public java.awt.Component getComponentAfter(java.awt.Container cont, java.awt.Component comp) {
+        int i = ordenTab.indexOf(comp);
+        if (i == -1) return ordenTab.get(0);
+        return ordenTab.get((i + 1) % ordenTab.size());
+    }
+
+    @Override
+    public java.awt.Component getComponentBefore(java.awt.Container cont, java.awt.Component comp) {
+        int i = ordenTab.indexOf(comp);
+        if (i == -1) return ordenTab.get(0);
+        return ordenTab.get((i - 1 + ordenTab.size()) % ordenTab.size());
+    }
+
+    @Override
+    public java.awt.Component getDefaultComponent(java.awt.Container cont) {
+        return ordenTab.get(0);
+    }
+
+    @Override
+    public java.awt.Component getFirstComponent(java.awt.Container cont) {
+        return ordenTab.get(0);
+    }
+
+    @Override
+    public java.awt.Component getLastComponent(java.awt.Container cont) {
+        return ordenTab.get(ordenTab.size() - 1);
+    }
+});
+
     
     // Agregar listener para doble clic en tabla
     tablaRepresentantes.addMouseListener(new java.awt.event.MouseAdapter() {

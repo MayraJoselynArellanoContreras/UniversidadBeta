@@ -39,6 +39,53 @@ public class Pagos extends javax.swing.JFrame {
         cargarTabla();
          this.getContentPane().setBackground(new Color(255, 235, 153));
         deshabilitarEdicion();
+        // ================================
+//   ORDEN DE TABULACIÓN PERSONALIZADO
+// ================================
+java.util.List<java.awt.Component> orden = java.util.Arrays.asList(
+        txtGarantia,
+        botonBuscarGarantia,
+        txtMonto,
+        txtFechaPago,
+        txtObservaciones,
+        botonRegistrar,
+        botonEliminar,
+        botonVerHistorial,
+        tablaPagos,
+        botonVolver
+);
+
+this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
+    @Override
+    public java.awt.Component getComponentAfter(java.awt.Container aContainer, java.awt.Component aComponent) {
+        int idx = orden.indexOf(aComponent);
+        if (idx == -1) return orden.get(0);
+        return orden.get((idx + 1) % orden.size());
+    }
+
+    @Override
+    public java.awt.Component getComponentBefore(java.awt.Container aContainer, java.awt.Component aComponent) {
+        int idx = orden.indexOf(aComponent);
+        if (idx == -1) return orden.get(0);
+        return orden.get((idx - 1 + orden.size()) % orden.size());
+    }
+
+    @Override
+    public java.awt.Component getFirstComponent(java.awt.Container aContainer) {
+        return orden.get(0);
+    }
+
+    @Override
+    public java.awt.Component getLastComponent(java.awt.Container aContainer) {
+        return orden.get(orden.size() - 1);
+    }
+
+    @Override
+    public java.awt.Component getDefaultComponent(java.awt.Container aContainer) {
+        return orden.get(0);
+    }
+});
+
     }
 
     /**

@@ -30,6 +30,58 @@ public class Donativos extends javax.swing.JFrame {
      */
     public Donativos() {
         initComponents();
+        // --- Configurar navegación por tabulación ---
+this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
+
+    @Override
+    public java.awt.Component getComponentAfter(java.awt.Container aContainer, java.awt.Component aComponent) {
+
+        if (aComponent.equals(txtIdDonativo)) return txtFechaRegistro;
+        if (aComponent.equals(txtFechaRegistro)) return txtIdGarantia;
+        if (aComponent.equals(txtIdGarantia)) return txtNombreDonador;
+        if (aComponent.equals(txtNombreDonador)) return txtFechaGarantia;
+        if (aComponent.equals(txtFechaGarantia)) return txtCantidadGarantizada;
+        if (aComponent.equals(txtCantidadGarantizada)) return txtCantidadRecibida;
+        if (aComponent.equals(txtCantidadRecibida)) return comboMetodo;
+        if (aComponent.equals(comboMetodo)) return txtNumTDC;
+        if (aComponent.equals(txtNumTDC)) return comboNumPagos;
+        if (aComponent.equals(comboNumPagos)) return comboCorporacion;
+        if (aComponent.equals(comboCorporacion)) return txtObservaciones;
+        if (aComponent.equals(txtObservaciones)) return botonRegistrar;
+        if (aComponent.equals(botonRegistrar)) return botonEliminarDonativo;
+        if (aComponent.equals(botonEliminarDonativo)) return tablaHistorial;
+        if (aComponent.equals(tablaHistorial)) return botonVolver;
+
+        return txtIdDonativo; // inicio del ciclo
+    }
+
+    @Override
+    public java.awt.Component getComponentBefore(java.awt.Container aContainer, java.awt.Component aComponent) {
+
+        if (aComponent.equals(txtFechaRegistro)) return txtIdDonativo;
+        if (aComponent.equals(txtIdGarantia)) return txtFechaRegistro;
+        if (aComponent.equals(txtNombreDonador)) return txtIdGarantia;
+        if (aComponent.equals(txtFechaGarantia)) return txtNombreDonador;
+        if (aComponent.equals(txtCantidadGarantizada)) return txtFechaGarantia;
+        if (aComponent.equals(txtCantidadRecibida)) return txtCantidadGarantizada;
+        if (aComponent.equals(comboMetodo)) return txtCantidadRecibida;
+        if (aComponent.equals(txtNumTDC)) return comboMetodo;
+        if (aComponent.equals(comboNumPagos)) return txtNumTDC;
+        if (aComponent.equals(comboCorporacion)) return comboNumPagos;
+        if (aComponent.equals(txtObservaciones)) return comboCorporacion;
+        if (aComponent.equals(botonRegistrar)) return txtObservaciones;
+        if (aComponent.equals(botonEliminarDonativo)) return botonRegistrar;
+        if (aComponent.equals(tablaHistorial)) return botonEliminarDonativo;
+        if (aComponent.equals(botonVolver)) return tablaHistorial;
+
+        return botonVolver; // final del ciclo
+    }
+
+    @Override public java.awt.Component getDefaultComponent(java.awt.Container c) { return txtIdDonativo; }
+    @Override public java.awt.Component getFirstComponent(java.awt.Container c) { return txtIdDonativo; }
+    @Override public java.awt.Component getLastComponent(java.awt.Container c) { return botonVolver; }
+});
+
         setLocationRelativeTo(null);
         cargarMetodosPago();
         cargarNumeroPagos();

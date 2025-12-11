@@ -41,6 +41,51 @@ public class Corporacion extends javax.swing.JFrame {
     }
     
     cargarTabla();
+    // ================================
+// ORDEN PERSONALIZADO DE TABULACIÓN
+// ================================
+java.util.List<java.awt.Component> ordenTab = java.util.Arrays.asList(
+        txtIdCorporacion,
+        txtNombreCorporacion,
+        txtDireccion,
+        botonAgregar,
+        botonEliminar,
+        botonLimpiar,
+        botonVolver,
+        tablaCorporaciones
+);
+
+this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
+    @Override
+    public java.awt.Component getComponentAfter(java.awt.Container root, java.awt.Component comp) {
+        int i = ordenTab.indexOf(comp);
+        if (i == -1) return ordenTab.get(0);
+        return ordenTab.get((i + 1) % ordenTab.size());
+    }
+
+    @Override
+    public java.awt.Component getComponentBefore(java.awt.Container root, java.awt.Component comp) {
+        int i = ordenTab.indexOf(comp);
+        if (i == -1) return ordenTab.get(0);
+        return ordenTab.get((i - 1 + ordenTab.size()) % ordenTab.size());
+    }
+
+    @Override
+    public java.awt.Component getDefaultComponent(java.awt.Container root) {
+        return ordenTab.get(0);
+    }
+
+    @Override
+    public java.awt.Component getFirstComponent(java.awt.Container root) {
+        return ordenTab.get(0);
+    }
+
+    @Override
+    public java.awt.Component getLastComponent(java.awt.Container root) {
+        return ordenTab.get(ordenTab.size() - 1);
+    }
+});
+
 }    
     
 private void agregarCorporacion() {

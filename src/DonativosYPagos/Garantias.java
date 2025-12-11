@@ -33,6 +33,73 @@ public class Garantias extends javax.swing.JFrame {
     public Garantias() {
   initComponents();
   setLocationRelativeTo(null);
+  // ==========================
+// NAVEGACIÓN POR TABULACIÓN
+// ==========================
+java.util.List<java.awt.Component> ordenTab = java.util.Arrays.asList(
+    txtIdGarantia,
+    txtFechaGarantia,
+    txtIdDonador,
+    txtNombreDonador,
+    txtCantidadGarantizada,
+    txtCantidadEnviada,
+    comboMetodoPago,
+    txtNumTDC,
+    comboNumeroPagos,
+    comboCorporacion,
+    txtDireccionCorporacion,
+    botonRegistrar,
+    botonEditarDonativo,       // Si no existe, coméntalo
+    botonEliminarDonativo,
+    botonBuscarDonativo,
+    botonLimpiar,
+    botonVolver,
+    tablaGarantias
+);
+
+this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
+    @Override
+    public java.awt.Component getComponentAfter(java.awt.Container aContainer, java.awt.Component aComponent) {
+        int idx = ordenTab.indexOf(aComponent);
+        return ordenTab.get((idx + 1) % ordenTab.size());
+    }
+
+    @Override
+    public java.awt.Component getComponentBefore(java.awt.Container aContainer, java.awt.Component aComponent) {
+        int idx = ordenTab.indexOf(aComponent);
+        return ordenTab.get((idx - 1 + ordenTab.size()) % ordenTab.size());
+    }
+
+    @Override
+    public java.awt.Component getDefaultComponent(java.awt.Container aContainer) {
+        return ordenTab.get(0);
+    }
+
+    @Override
+    public java.awt.Component getFirstComponent(java.awt.Container aContainer) {
+        return ordenTab.get(0);
+    }
+
+    @Override
+    public java.awt.Component getLastComponent(java.awt.Container aContainer) {
+        return ordenTab.get(ordenTab.size() - 1);
+    }
+});
+
+// Enter funciona como TAB
+javax.swing.KeyStroke enter = javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, 0);
+javax.swing.KeyStroke tab = javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_TAB, 0);
+
+this.getRootPane().getInputMap(javax.swing.JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(enter, "tabFocus");
+this.getRootPane().getActionMap().put("tabFocus", new javax.swing.AbstractAction() {
+    @Override
+    public void actionPerformed(java.awt.event.ActionEvent e) {
+        java.awt.Component c = javax.swing.FocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+        java.awt.Component next = getFocusTraversalPolicy().getComponentAfter(getContentPane(), c);
+        if (next != null) next.requestFocus();
+    }
+});
+
     cargarMetodosPago();
     cargarNumeroPagos();
     cargarCorporaciones();

@@ -21,6 +21,42 @@ public class Login extends javax.swing.JFrame {
     public Login() {
         initComponents();
         setLocationRelativeTo(null);
+        
+        java.util.List<java.awt.Component> orden = java.util.Arrays.asList(
+        txtUsuario,
+        txtContraseña,
+        botonIniciarSesion,
+        botonSalir
+);
+
+setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
+    @Override
+    public java.awt.Component getComponentAfter(java.awt.Container aContainer, java.awt.Component aComponent) {
+        int i = orden.indexOf(aComponent);
+        return orden.get((i + 1) % orden.size());
+    }
+
+    @Override
+    public java.awt.Component getComponentBefore(java.awt.Container aContainer, java.awt.Component aComponent) {
+        int i = orden.indexOf(aComponent);
+        return orden.get((i - 1 + orden.size()) % orden.size());
+    }
+
+    @Override
+    public java.awt.Component getFirstComponent(java.awt.Container aContainer) {
+        return orden.get(0);
+    }
+
+    @Override
+    public java.awt.Component getLastComponent(java.awt.Container aContainer) {
+        return orden.get(orden.size() - 1);
+    }
+
+    @Override
+    public java.awt.Component getDefaultComponent(java.awt.Container aContainer) {
+        return orden.get(0);
+    }
+});
     }
 
     /**

@@ -24,6 +24,47 @@ public class ConfigFiscal extends javax.swing.JFrame {
      */
     public ConfigFiscal() {
         initComponents();
+        // --- Configurar navegación por tabulación ---
+this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
+    @Override
+    public java.awt.Component getComponentAfter(java.awt.Container aContainer, java.awt.Component aComponent) {
+
+        if (aComponent.equals(txtID)) return txtNombre;
+        if (aComponent.equals(txtNombre)) return txtFechaInicio;
+        if (aComponent.equals(txtFechaInicio)) return txtFechaFin;
+        if (aComponent.equals(txtFechaFin)) return txtEstado;
+
+        if (aComponent.equals(txtEstado)) return botonActivar;
+        if (aComponent.equals(botonActivar)) return botonEditar;
+        if (aComponent.equals(botonEditar)) return botonEliminar;
+        if (aComponent.equals(botonEliminar)) return tablaAnios;
+        if (aComponent.equals(tablaAnios)) return botonVolver;
+
+        return txtID; // inicio del ciclo
+    }
+
+    @Override
+    public java.awt.Component getComponentBefore(java.awt.Container aContainer, java.awt.Component aComponent) {
+
+        if (aComponent.equals(txtNombre)) return txtID;
+        if (aComponent.equals(txtFechaInicio)) return txtNombre;
+        if (aComponent.equals(txtFechaFin)) return txtFechaInicio;
+        if (aComponent.equals(txtEstado)) return txtFechaFin;
+
+        if (aComponent.equals(botonActivar)) return txtEstado;
+        if (aComponent.equals(botonEditar)) return botonActivar;
+        if (aComponent.equals(botonEliminar)) return botonEditar;
+        if (aComponent.equals(tablaAnios)) return botonEliminar;
+        if (aComponent.equals(botonVolver)) return tablaAnios;
+
+        return botonVolver; // final del ciclo
+    }
+
+    @Override public java.awt.Component getDefaultComponent(java.awt.Container aContainer) { return txtID; }
+    @Override public java.awt.Component getFirstComponent(java.awt.Container aContainer) { return txtID; }
+    @Override public java.awt.Component getLastComponent(java.awt.Container aContainer) { return botonVolver; }
+});
+
         setLocationRelativeTo(null);
         configurarTabla();
         cargarTabla();

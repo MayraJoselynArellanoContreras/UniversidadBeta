@@ -30,6 +30,57 @@ public class Voluntarios extends javax.swing.JFrame {
         cargarTablaVoluntarios();
         configurarFechaRegistro();
         
+        // --- ORDEN PERSONALIZADO DE TABULACIÓN ---
+java.util.List<java.awt.Component> ordenTab = java.util.Arrays.asList(
+    txtNombre,
+    txtTelefono,
+    txtEmail,
+    txtDireccion,
+    txtFechaRegistro,
+    chkEstudiante,
+    chkActivo,
+    txtObservaciones,
+    botonAgregar,
+    botonEditar,
+    botonEliminar,
+    botonBuscar,
+    botonLimpiar,
+    botonVolver,
+    tablaVoluntarios
+);
+
+// Política personalizada de tabulación
+setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
+
+    @Override
+    public java.awt.Component getComponentAfter(java.awt.Container container, java.awt.Component comp) {
+        int idx = ordenTab.indexOf(comp);
+        return ordenTab.get((idx + 1) % ordenTab.size());
+    }
+
+    @Override
+    public java.awt.Component getComponentBefore(java.awt.Container container, java.awt.Component comp) {
+        int idx = ordenTab.indexOf(comp);
+        return ordenTab.get((idx - 1 + ordenTab.size()) % ordenTab.size());
+    }
+
+    @Override
+    public java.awt.Component getFirstComponent(java.awt.Container container) {
+        return ordenTab.get(0);
+    }
+
+    @Override
+    public java.awt.Component getLastComponent(java.awt.Container container) {
+        return ordenTab.get(ordenTab.size() - 1);
+    }
+
+    @Override
+    public java.awt.Component getDefaultComponent(java.awt.Container container) {
+        return ordenTab.get(0);
+    }
+});
+
+        
         // Inicialmente deshabilitar botón de editar
         botonEditar.setEnabled(false);
         

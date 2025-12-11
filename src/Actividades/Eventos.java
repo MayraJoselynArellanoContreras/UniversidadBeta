@@ -34,6 +34,54 @@ public class Eventos extends javax.swing.JFrame {
         cargarTablaEventos();
         configurarFecha();
         
+        // --- ORDEN PERSONALIZADO DE TABULACIÓN ---
+java.util.List<java.awt.Component> ordenTab = java.util.Arrays.asList(
+    txtNombreEvento,
+    txtFecha,
+    comboTipo,
+    txtLugar,
+    txtRecaudacion,
+    txtDescripcion,
+    botonGuardarEvento,
+    botonEditar,
+    botonEliminar,
+    botonBuscar,
+    botonLimpiar,
+    botonVolver,
+    tablaEventos
+);
+
+setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
+
+    @Override
+    public java.awt.Component getComponentAfter(java.awt.Container aContainer, java.awt.Component aComponent) {
+        int i = ordenTab.indexOf(aComponent);
+        return ordenTab.get((i + 1) % ordenTab.size());
+    }
+
+    @Override
+    public java.awt.Component getComponentBefore(java.awt.Container aContainer, java.awt.Component aComponent) {
+        int i = ordenTab.indexOf(aComponent);
+        return ordenTab.get((i - 1 + ordenTab.size()) % ordenTab.size());
+    }
+
+    @Override
+    public java.awt.Component getFirstComponent(java.awt.Container aContainer) {
+        return ordenTab.get(0);
+    }
+
+    @Override
+    public java.awt.Component getLastComponent(java.awt.Container aContainer) {
+        return ordenTab.get(ordenTab.size() - 1);
+    }
+
+    @Override
+    public java.awt.Component getDefaultComponent(java.awt.Container aContainer) {
+        return ordenTab.get(0);
+    }
+});
+
+        
         // Inicialmente deshabilitar botón de editar
         botonEditar.setEnabled(false);
         
@@ -918,9 +966,9 @@ private void limpiarCampos() {
     }// </editor-fold>//GEN-END:initComponents
 
     private void botonVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonVolverActionPerformed
-       MenuPrincipal menu = new MenuPrincipal();   
-    menu.setVisible(true);
-    this.dispose();  
+       actividades a = new actividades();
+       a.setVisible(true);
+       this.dispose(); 
     }//GEN-LAST:event_botonVolverActionPerformed
 
     private void botonGuardarEventoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonGuardarEventoActionPerformed

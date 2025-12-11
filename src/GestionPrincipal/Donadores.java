@@ -42,442 +42,444 @@ public class Donadores extends javax.swing.JFrame {
         }
     }
 });
+    
+    // ================================
+// ORDEN PERSONALIZADO DE TABULACIÓN
+// ================================
+java.util.List<java.awt.Component> ordenTab = java.util.Arrays.asList(
+        txtIdDonador,
+        botonGenerarId,   // si NO existe quítalo
+        txtNombre,
+        txtDireccion,
+        txtTelefono,
+        txtCorreo,
+        txtConyuge,
+        combCategoria,
+        spinnerAñoGraduacion,
+        comboCorporacion,
+        botonAgregar,
+        botonEditar,
+        botonEliminar,
+        botonLimpiar,
+        botonVolver,
+        tablaListaDonadores
+);
+
+this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
+    @Override
+    public java.awt.Component getComponentAfter(java.awt.Container root, java.awt.Component comp) {
+        int i = ordenTab.indexOf(comp);
+        if (i == -1) return ordenTab.get(0);
+        return ordenTab.get((i + 1) % ordenTab.size());
+    }
+
+    @Override
+    public java.awt.Component getComponentBefore(java.awt.Container root, java.awt.Component comp) {
+        int i = ordenTab.indexOf(comp);
+        if (i == -1) return ordenTab.get(0);
+        return ordenTab.get((i - 1 + ordenTab.size()) % ordenTab.size());
+    }
+
+    @Override
+    public java.awt.Component getDefaultComponent(java.awt.Container root) {
+        return ordenTab.get(0);
+    }
+
+    @Override
+    public java.awt.Component getFirstComponent(java.awt.Container root) {
+        return ordenTab.get(0);
+    }
+
+    @Override
+    public java.awt.Component getLastComponent(java.awt.Container root) {
+        return ordenTab.get(ordenTab.size() - 1);
+    }
+});
+
     }
     
-private void configurarspinnerAñoGraduacion() {
-     int añoActual = java.time.Year.now().getValue();
-    
-    javax.swing.SpinnerNumberModel model = new javax.swing.SpinnerNumberModel(
-        añoActual,          
-        1990,               
-        añoActual,          
-        1                   
-    );
-    
-    model.setValue(Integer.valueOf(añoActual));
-    
-    spinnerAñoGraduacion.setModel(model);
-    
-
-    javax.swing.JSpinner.NumberEditor editor = new javax.swing.JSpinner.NumberEditor(
-        spinnerAñoGraduacion, 
-        "####"  
-    );
-    
-    spinnerAñoGraduacion.setEditor(editor);
-    editor.getTextField().setHorizontalAlignment(javax.swing.JTextField.CENTER);
-}
-    
-private void cargarDonadorDesdeTabla() {
-    int fila = tablaListaDonadores.getSelectedRow();
-    if (fila == -1) {
-        return;
-    }
-    
-    String idDonador = tablaListaDonadores.getValueAt(fila, 0).toString();
-    buscarDonadorPorID(idDonador);
-}
-
-private void buscarDonadorPorID(String idDonador) {
-    String sql = """
-        SELECT 
-            D.idDonador,
-            D.nombre,
-            D.telefono,
-            D.email,
-            D.direccion,
-            D.anioGraduacion,
-            D.conyuge,
-            D.idCategoria,
-            D.idCorporacion
-        FROM Donador D
-        WHERE D.idDonador = ?
-        """;
-
-    try (Connection con = ConexionBD.getConexion();
-         PreparedStatement ps = con.prepareStatement(sql)) {
+ private void configurarspinnerAñoGraduacion() {
+        int añoActual = java.time.Year.now().getValue();
+        javax.swing.SpinnerNumberModel model = new javax.swing.SpinnerNumberModel(
+            añoActual, 1990, añoActual, 1
+        );
+        model.setValue(Integer.valueOf(añoActual));
+        spinnerAñoGraduacion.setModel(model);
         
-        ps.setString(1, idDonador);
-        ResultSet rs = ps.executeQuery();
+        javax.swing.JSpinner.NumberEditor editor = new javax.swing.JSpinner.NumberEditor(
+            spinnerAñoGraduacion, "####"
+        );
+        spinnerAñoGraduacion.setEditor(editor);
+        editor.getTextField().setHorizontalAlignment(javax.swing.JTextField.CENTER);
+    }
+
+    // ================== MÉTODOS DE CARGA DE DATOS ==================
+    
+    private void cargarDonadorDesdeTabla() {
+        int fila = tablaListaDonadores.getSelectedRow();
+        if (fila == -1) return;
         
-        if (rs.next()) {
-            cargarDatosEnFormulario(rs);
-            
-            JOptionPane.showMessageDialog(this, 
-                "Datos cargados para edición.\nModifique y haga clic en 'Editar'.",
-                "Modo edición", 
-                JOptionPane.INFORMATION_MESSAGE);
-        }
-        
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, 
-            "Error al cargar datos: " + e.getMessage(),
-            "Error", 
-            JOptionPane.ERROR_MESSAGE);
-    }
-}
-    
-private void cargarCategorias() {
-    String sql = "SELECT idCategoria, nombre FROM CategoriaDonador ORDER BY nombre";
-
-    try (Connection con = ConexionBD.getConexion();
-         PreparedStatement ps = con.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
-
-        combCategoria.removeAllItems();
-        combCategoria.addItem(new CategoriaItem(0, "Seleccione categoría..."));
-
-        while (rs.next()) {
-            int id = rs.getInt("idCategoria");
-            String nombre = rs.getString("nombre");
-            combCategoria.addItem(new CategoriaItem(id, nombre));
-        }
-
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, "Error al cargar categorías: " + e.getMessage());
-        e.printStackTrace();
-    }
-}
-
- private boolean validarCamposObligatorios() {
-    StringBuilder errores = new StringBuilder();
-    boolean hayErrores = false;
-    
-    txtNombre.setBackground(Color.WHITE);
-    txtDireccion.setBackground(Color.WHITE);
-    combCategoria.setBackground(Color.WHITE);
-    txtTelefono.setBackground(Color.WHITE);
-    txtCorreo.setBackground(Color.WHITE);
-    txtIdDonador.setBackground(Color.WHITE);
-    // NO validar comboCorporacion aquí
-
-    String idDonador = txtIdDonador.getText().trim();
-    if (idDonador.isEmpty() || idDonador.contains("Presiona") || idDonador.contains("DON")) {
-        errores.append("• Debe generar el ID del donador primero\n");
-        txtIdDonador.setBackground(new Color(255, 200, 200));
-        hayErrores = true;
+        String idDonador = tablaListaDonadores.getValueAt(fila, 0).toString();
+        buscarDonadorPorID(idDonador);
     }
 
-    String nombre = txtNombre.getText().trim();
-    if (nombre.isEmpty()) {
-        errores.append("• El nombre es obligatorio\n");
-        txtNombre.setBackground(new Color(255, 200, 200));
-        hayErrores = true;
-    }
-
-    String direccion = txtDireccion.getText().trim();
-    if (direccion.isEmpty()) {
-        errores.append("• La dirección es obligatoria\n");
-        txtDireccion.setBackground(new Color(255, 200, 200));
-        hayErrores = true;
-    }
-
-    if (combCategoria.getSelectedIndex() <= 0) {
-        errores.append("• Debe seleccionar una categoría\n");
-        combCategoria.setBackground(new Color(255, 200, 200));
-        hayErrores = true;
-    } else {
-        CategoriaItem categoria = (CategoriaItem) combCategoria.getSelectedItem();
-        if (categoria.getNombre().toLowerCase().contains("alumno")) {
-            int año = (Integer) spinnerAñoGraduacion.getValue();
-            if (año <= 1900 || año > java.time.Year.now().getValue()) {
-                errores.append("• Año de graduación inválido para alumno\n");
-                spinnerAñoGraduacion.setBackground(new Color(255, 200, 200));
-                hayErrores = true;
-            }
-        }
-    }
-
-    String telefono = txtTelefono.getText().trim();
-    if (telefono.isEmpty() || telefono.equals("(  )    -")) {
-        errores.append("• El teléfono es obligatorio\n");
-        txtTelefono.setBackground(new Color(255, 200, 200));
-        hayErrores = true;
-    } else {
-        String soloNumeros = telefono.replaceAll("[^0-9]", "");
-        if (soloNumeros.length() < 8) {
-            errores.append("• Teléfono debe tener al menos 8 dígitos\n");
-            txtTelefono.setBackground(new Color(255, 200, 200));
-            hayErrores = true;
-        }
-    }
-
-    String email = txtCorreo.getText().trim();
-    if (!email.isEmpty()) {
-        if (!email.contains("@") || !email.contains(".") || email.length() < 5) {
-            errores.append("• Email no tiene formato válido\n");
-            txtCorreo.setBackground(new Color(255, 200, 200));
-            hayErrores = true;
-        }
-    }
-
-    // NO VALIDAR CORPORACIÓN - ES OPCIONAL
-    
-    if (hayErrores) {
-        JOptionPane.showMessageDialog(this, 
-            "Por favor complete los siguientes campos:\n\n" + errores.toString(), 
-            "Campos incompletos", 
-            JOptionPane.WARNING_MESSAGE);
-        return false;
-    }
-    
-    return true;
-}
-
- 
-    private void cargarCorporaciones() {
-    String sql = "SELECT idCorporacion, nombre FROM Corporacion ORDER BY nombre";
-
-    try (Connection con = ConexionBD.getConexion();
-         PreparedStatement ps = con.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
-
-        comboCorporacion.removeAllItems();
-        comboCorporacion.addItem(new CorporacionItem(0, "Seleccione corporación...")); // Opción por defecto
-
-        while(rs.next()) {
-            comboCorporacion.addItem(
-                new CorporacionItem(
-                    rs.getInt("idCorporacion"),
-                    rs.getString("nombre")
-                )
-            );
-        }
-
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, "Error al cargar corporaciones: " + e.getMessage());
-        e.printStackTrace();
-    }
-}
-
-    // Carga la tabla de donadores
-private void cargarTabla() {
-
-    String sql = """
-        SELECT 
-            D.idDonador,
-            D.nombre,
-            D.telefono,
-            D.email,
-            D.direccion,
-            ISNULL(C.nombre, 'Sin categoría') as categoria,
-            ISNULL(CORP.nombre, 'Sin corporación') as corporacion,
-            D.idCategoria,
-            D.idCorporacion
-        FROM Donador D
-        LEFT JOIN CategoriaDonador C ON D.idCategoria = C.idCategoria
-        LEFT JOIN Corporacion CORP ON D.idCorporacion = CORP.idCorporacion
-        ORDER BY D.nombre
-        """;
-
-    try (Connection con = ConexionBD.getConexion();
-         PreparedStatement ps = con.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
-
-
-        javax.swing.table.DefaultTableModel modelo = 
-            new javax.swing.table.DefaultTableModel(
-                new Object[]{"ID", "Nombre", "Teléfono", "Email", "Dirección", "Categoría", "Corporación"}, 0) {
-            
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-
-        while (rs.next()) {
-            modelo.addRow(new Object[]{
-                rs.getString("idDonador"),
-                rs.getString("nombre"),
-                rs.getString("telefono"),
-                rs.getString("email"),
-                rs.getString("direccion"),
-                rs.getString("categoria"),
-                rs.getString("corporacion")
-            });
-        }
-
-        tablaListaDonadores.setModel(modelo);
-        
-
-        if (tablaListaDonadores.getColumnCount() >= 7) {
-            tablaListaDonadores.getColumnModel().getColumn(0).setPreferredWidth(80);   // ID
-            tablaListaDonadores.getColumnModel().getColumn(1).setPreferredWidth(150);  // Nombre
-            tablaListaDonadores.getColumnModel().getColumn(2).setPreferredWidth(100);  // Teléfono
-            tablaListaDonadores.getColumnModel().getColumn(3).setPreferredWidth(150);  // Email
-            tablaListaDonadores.getColumnModel().getColumn(4).setPreferredWidth(200);  // Dirección
-            tablaListaDonadores.getColumnModel().getColumn(5).setPreferredWidth(100);  // Categoría
-            tablaListaDonadores.getColumnModel().getColumn(6).setPreferredWidth(150);  // Corporación
-        }
-
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, 
-            "Error al cargar donadores: " + e.getMessage(), 
-            "Error de base de datos", 
-            JOptionPane.ERROR_MESSAGE);
-        e.printStackTrace();
-    }
-}
-    
-     private String generarIdDonador(String nombreCompleto) {
-        String limpio = nombreCompleto.trim().toUpperCase()
-            .replaceAll("[ÁÀÄÂ]", "A")
-            .replaceAll("[ÉÈËÊ]", "E")
-            .replaceAll("[ÍÌÏÎ]", "I")
-            .replaceAll("[ÓÒÖÔ]", "O")
-            .replaceAll("[ÚÙÜÛ]", "U")
-            .replaceAll("[^A-Z\\s]", " ");
-        String[] partes = limpio.split("\\s+");
-        String iniciales = "DON";
-
-        if (partes.length >= 3) {
-            iniciales = "" + partes[0].charAt(0) + partes[1].charAt(0) + partes[2].charAt(0);
-        } else if (partes.length == 2) {
-            iniciales = "" + partes[0].charAt(0) + partes[1].charAt(0);
-        } else if (partes.length == 1 && partes[0].length() >= 3) {
-            iniciales = partes[0].substring(0, 3);
-        }
-
-        String año = String.format("%02d", java.time.Year.now().getValue() % 100);
-        String prefijo = iniciales + año;
-
-    
+    private void buscarDonadorPorID(String idDonador) {
         String sql = """
-            SELECT ISNULL(MAX(CAST(RIGHT(idDonador, 3) AS INT)), 0) + 1 AS siguiente
-            FROM Donador
-            WHERE idDonador LIKE ?
-            """;
-
-        try (Connection con = ConexionBD.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setString(1, prefijo + "-%");
-            ResultSet rs = ps.executeQuery();
-
-            int siguiente = 1;
-            if (rs.next()) {
-                siguiente = rs.getInt("siguiente");
-            }
-
-            return prefijo + "-" + String.format("%03d", siguiente);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return prefijo + "-001";
-        }
-    }
-     
-
-private void agregarDonador() {
-    if (!validarCamposObligatorios()) {
-        return;
-    }
-
-    try {
-        String idDonador = txtIdDonador.getText().trim();
-        String nombre = txtNombre.getText().trim();
-        String direccion = txtDireccion.getText().trim();
-        CategoriaItem categoria = (CategoriaItem) combCategoria.getSelectedItem();
-
-        int añoGraduacion;
-        if (categoria.getNombre().toLowerCase().contains("alumno")) {
-            añoGraduacion = (Integer) spinnerAñoGraduacion.getValue();
-        } else {
-            añoGraduacion = 0;
-        }
-        
-        String telefono = txtTelefono.getText().trim().replaceAll("[^0-9]", "");
-        String email = txtCorreo.getText().trim();
-        String conyuge = txtConyuge.getText().trim();
-        
-        // OBTENER CORPORACIÓN
-        CorporacionItem corporacion = (CorporacionItem) comboCorporacion.getSelectedItem();
-        
-        String sql = """
-            INSERT INTO Donador 
-            (idDonador, nombre, direccion, idCategoria, anioGraduacion, 
-             telefono, email, idCorporacion, conyuge)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """;
+            SELECT D.idDonador, D.nombre, D.telefono, D.email, D.direccion, 
+                   D.anioGraduacion, D.conyuge, D.idCategoria, D.idCorporacion
+            FROM Donador D 
+            WHERE D.idDonador = ?
+        """;
         
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setString(1, idDonador);
-            ps.setString(2, nombre);
-            ps.setString(3, direccion);
-            ps.setInt(4, categoria.getId());
+            ResultSet rs = ps.executeQuery();
             
-            if (añoGraduacion > 0) {
-                ps.setInt(5, añoGraduacion);
-            } else {
-                ps.setNull(5, java.sql.Types.INTEGER);
-            }
-            
-            ps.setString(6, telefono);
-            ps.setString(7, email.isEmpty() ? null : email);
-            
-            // IMPORTANTE: Solo insertar idCorporacion si es mayor a 0
-            if (corporacion != null && corporacion.getId() > 0) {
-                ps.setInt(8, corporacion.getId());
-            } else {
-                ps.setNull(8, java.sql.Types.INTEGER); // NULL si no seleccionó
-            }
-            
-            ps.setString(9, conyuge.isEmpty() ? null : conyuge);
-            
-            int filasAfectadas = ps.executeUpdate();
-            
-            if (filasAfectadas > 0) {
+            if (rs.next()) {
+                cargarDatosEnFormulario(rs);
                 JOptionPane.showMessageDialog(this, 
-                    "Donador registrado exitosamente!\n\n" +
-                    "ID: " + idDonador + "\n" +
-                    "Nombre: " + nombre + "\n" +
-                    "Categoría: " + categoria.getNombre() + 
-                    (corporacion.getId() > 0 ? "\nCorporación: " + corporacion.getNombre() : ""), 
-                    "Registro exitoso", 
-                    JOptionPane.INFORMATION_MESSAGE);
-                
-                cargarTabla();
-                limpiarCampos();
-                txtIdDonador.setText("Presiona Generar ID");
-                txtIdDonador.setForeground(Color.GRAY);
+                    "Datos cargados para edición.\nModifique y haga clic en 'Editar'.",
+                    "Modo edición", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, 
+                "Error al cargar datos: " + e.getMessage(), 
+                "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void cargarCategorias() {
+        String sql = "SELECT idCategoria, nombre FROM CategoriaDonador ORDER BY nombre";
+        
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            
+            combCategoria.removeAllItems();
+            combCategoria.addItem(new CategoriaItem(0, "Seleccione categoría..."));
+            
+            while (rs.next()) {
+                int id = rs.getInt("idCategoria");
+                String nombre = rs.getString("nombre");
+                combCategoria.addItem(new CategoriaItem(id, nombre));
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al cargar categorías: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void cargarCorporaciones() {
+        String sql = "SELECT idCorporacion, nombre FROM Corporacion ORDER BY nombre";
+        
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            
+            comboCorporacion.removeAllItems();
+            comboCorporacion.addItem(new CorporacionItem(0, "Seleccione corporación..."));
+            
+            while(rs.next()) {
+                comboCorporacion.addItem(new CorporacionItem(
+                    rs.getInt("idCorporacion"),
+                    rs.getString("nombre")
+                ));
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al cargar corporaciones: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void cargarTabla() {
+        String sql = """
+            SELECT D.idDonador, D.nombre, D.telefono, D.email, D.direccion,
+                   ISNULL(C.nombre, 'Sin categoría') as categoria,
+                   ISNULL(CORP.nombre, 'Sin corporación') as corporacion,
+                   D.idCategoria, D.idCorporacion
+            FROM Donador D
+            LEFT JOIN CategoriaDonador C ON D.idCategoria = C.idCategoria
+            LEFT JOIN Corporacion CORP ON D.idCorporacion = CORP.idCorporacion
+            ORDER BY D.nombre
+        """;
+        
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            
+            javax.swing.table.DefaultTableModel modelo = new javax.swing.table.DefaultTableModel(
+                new Object[]{"ID", "Nombre", "Teléfono", "Email", "Dirección", "Categoría", "Corporación"}, 0) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+            
+            while (rs.next()) {
+                modelo.addRow(new Object[]{
+                    rs.getString("idDonador"),
+                    rs.getString("nombre"),
+                    rs.getString("telefono"),
+                    rs.getString("email"),
+                    rs.getString("direccion"),
+                    rs.getString("categoria"),
+                    rs.getString("corporacion")
+                });
+            }
+            
+            tablaListaDonadores.setModel(modelo);
+            
+            if (tablaListaDonadores.getColumnCount() >= 7) {
+                tablaListaDonadores.getColumnModel().getColumn(0).setPreferredWidth(80);   // ID
+                tablaListaDonadores.getColumnModel().getColumn(1).setPreferredWidth(150);  // Nombre
+                tablaListaDonadores.getColumnModel().getColumn(2).setPreferredWidth(100);  // Teléfono
+                tablaListaDonadores.getColumnModel().getColumn(3).setPreferredWidth(150);  // Email
+                tablaListaDonadores.getColumnModel().getColumn(4).setPreferredWidth(200);  // Dirección
+                tablaListaDonadores.getColumnModel().getColumn(5).setPreferredWidth(100);  // Categoría
+                tablaListaDonadores.getColumnModel().getColumn(6).setPreferredWidth(150);  // Corporación
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, 
+                "Error al cargar donadores: " + e.getMessage(),
+                "Error de base de datos", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+
+    // ================== VALIDACIONES ==================
+    
+    private boolean validarCamposObligatorios() {
+        StringBuilder errores = new StringBuilder();
+        boolean hayErrores = false;
+        
+        reiniciarColoresCampos();
+        
+        // Validar ID Donador
+        String idDonador = txtIdDonador.getText().trim();
+        if (idDonador.isEmpty() || idDonador.contains("Presiona") || idDonador.contains("DON")) {
+            errores.append("• Debe generar el ID del donador primero\n");
+            txtIdDonador.setBackground(new Color(255, 200, 200));
+            hayErrores = true;
+        }
+        
+        // Validar Nombre
+        String nombre = txtNombre.getText().trim();
+        if (nombre.isEmpty()) {
+            errores.append("• El nombre es obligatorio\n");
+            txtNombre.setBackground(new Color(255, 200, 200));
+            hayErrores = true;
+        }
+        
+        // Validar Dirección
+        String direccion = txtDireccion.getText().trim();
+        if (direccion.isEmpty()) {
+            errores.append("• La dirección es obligatoria\n");
+            txtDireccion.setBackground(new Color(255, 200, 200));
+            hayErrores = true;
+        }
+        
+        // Validar Categoría
+        if (combCategoria.getSelectedIndex() <= 0) {
+            errores.append("• Debe seleccionar una categoría\n");
+            combCategoria.setBackground(new Color(255, 200, 200));
+            hayErrores = true;
+        } else {
+            CategoriaItem categoria = (CategoriaItem) combCategoria.getSelectedItem();
+            if (categoria.getNombre().toLowerCase().contains("alumno")) {
+                int año = (Integer) spinnerAñoGraduacion.getValue();
+                if (año <= 1900 || año > java.time.Year.now().getValue()) {
+                    errores.append("• Año de graduación inválido para alumno\n");
+                    spinnerAñoGraduacion.setBackground(new Color(255, 200, 200));
+                    hayErrores = true;
+                }
             }
         }
         
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, 
-            "Error al guardar en la base de datos:\n" + e.getMessage(), 
-            "Error de base de datos", 
-            JOptionPane.ERROR_MESSAGE);
-        e.printStackTrace();
+        // Validar Teléfono
+        String telefono = txtTelefono.getText().trim();
+        if (telefono.isEmpty() || telefono.equals("( ) -")) {
+            errores.append("• El teléfono es obligatorio\n");
+            txtTelefono.setBackground(new Color(255, 200, 200));
+            hayErrores = true;
+        } else {
+            String soloNumeros = telefono.replaceAll("[^0-9]", "");
+            if (soloNumeros.length() < 8) {
+                errores.append("• Teléfono debe tener al menos 8 dígitos\n");
+                txtTelefono.setBackground(new Color(255, 200, 200));
+                hayErrores = true;
+            }
+        }
+        
+        // Validar Email
+        String email = txtCorreo.getText().trim();
+        if (!email.isEmpty() && (!email.contains("@") || !email.contains(".") || email.length() < 5)) {
+            errores.append("• Email no tiene formato válido\n");
+            txtCorreo.setBackground(new Color(255, 200, 200));
+            hayErrores = true;
+        }
+        
+        if (hayErrores) {
+            JOptionPane.showMessageDialog(this, 
+                "Por favor complete los siguientes campos:\n\n" + errores.toString(),
+                "Campos incompletos", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+        
+        return true;
     }
-}
 
-private void eliminarDonador() {
-    int fila = tablaListaDonadores.getSelectedRow();
-    if (fila == -1) {
-        JOptionPane.showMessageDialog(this, 
-            "Seleccione un donador de la tabla para eliminar",
-            "Selección requerida", 
-            JOptionPane.WARNING_MESSAGE);
-        return;
+    private void reiniciarColoresCampos() {
+        txtNombre.setBackground(Color.WHITE);
+        txtDireccion.setBackground(Color.WHITE);
+        combCategoria.setBackground(Color.WHITE);
+        txtTelefono.setBackground(Color.WHITE);
+        txtCorreo.setBackground(Color.WHITE);
+        txtIdDonador.setBackground(Color.WHITE);
+        comboCorporacion.setBackground(Color.WHITE);
+        spinnerAñoGraduacion.setBackground(Color.WHITE);
     }
+
+    // ================== MÉTODOS CRUD ==================
     
-    String idDonador = tablaListaDonadores.getValueAt(fila, 0).toString();
-    String nombre = tablaListaDonadores.getValueAt(fila, 1).toString();
-    
-    // Confirmar eliminación
-    int confirmacion = JOptionPane.showConfirmDialog(this,
-        "¿Está seguro de eliminar al donador?\n\n" +
-        "ID: " + idDonador + "\n" +
-        "Nombre: " + nombre + "\n\n" +
-        "Advertencia: Esta acción no se puede deshacer.",
-        "Confirmar eliminación", 
-        JOptionPane.YES_NO_OPTION, 
-        JOptionPane.WARNING_MESSAGE);
-    
-    if (confirmacion == JOptionPane.YES_OPTION) {
+    private void agregarDonador() {
+        if (!validarCamposObligatorios()) return;
+        
+        try {
+            String idDonador = txtIdDonador.getText().trim();
+            String nombre = txtNombre.getText().trim();
+            String direccion = txtDireccion.getText().trim();
+            CategoriaItem categoria = (CategoriaItem) combCategoria.getSelectedItem();
+            
+            int añoGraduacion;
+            if (categoria.getNombre().toLowerCase().contains("alumno")) {
+                añoGraduacion = (Integer) spinnerAñoGraduacion.getValue();
+            } else {
+                añoGraduacion = 0;
+            }
+            
+            String telefono = txtTelefono.getText().trim().replaceAll("[^0-9]", "");
+            String email = txtCorreo.getText().trim();
+            String conyuge = txtConyuge.getText().trim();
+            CorporacionItem corporacion = (CorporacionItem) comboCorporacion.getSelectedItem();
+            
+            String sql = """
+                INSERT INTO Donador (idDonador, nombre, direccion, idCategoria, 
+                                    anioGraduacion, telefono, email, idCorporacion, conyuge)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """;
+            
+            try (Connection con = ConexionBD.getConexion();
+                 PreparedStatement ps = con.prepareStatement(sql)) {
+                
+                ps.setString(1, idDonador);
+                ps.setString(2, nombre);
+                ps.setString(3, direccion);
+                ps.setInt(4, categoria.getId());
+                
+                if (añoGraduacion > 0) {
+                    ps.setInt(5, añoGraduacion);
+                } else {
+                    ps.setNull(5, java.sql.Types.INTEGER);
+                }
+                
+                ps.setString(6, telefono);
+                ps.setString(7, email.isEmpty() ? null : email);
+                
+                if (corporacion != null && corporacion.getId() > 0) {
+                    ps.setInt(8, corporacion.getId());
+                } else {
+                    ps.setNull(8, java.sql.Types.INTEGER);
+                }
+                
+                ps.setString(9, conyuge.isEmpty() ? null : conyuge);
+                
+                int filasAfectadas = ps.executeUpdate();
+                
+                if (filasAfectadas > 0) {
+                    String mensaje = "Donador registrado exitosamente!\n\n" +
+                                    "ID: " + idDonador + "\n" +
+                                    "Nombre: " + nombre + "\n" +
+                                    "Categoría: " + categoria.getNombre();
+                    
+                    if (corporacion.getId() > 0) {
+                        mensaje += "\nCorporación: " + corporacion.getNombre();
+                    }
+                    
+                    JOptionPane.showMessageDialog(this, mensaje,
+                        "Registro exitoso", JOptionPane.INFORMATION_MESSAGE);
+                    
+                    cargarTabla();
+                    limpiarCampos();
+                    txtIdDonador.setText("Presiona Generar ID");
+                    txtIdDonador.setForeground(Color.GRAY);
+                }
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, 
+                "Error al guardar en la base de datos:\n" + e.getMessage(),
+                "Error de base de datos", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+
+    private void eliminarDonador() {
+        int fila = tablaListaDonadores.getSelectedRow();
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this, 
+                "Seleccione un donador de la tabla para eliminar",
+                "Selección requerida", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        String idDonador = tablaListaDonadores.getValueAt(fila, 0).toString();
+        String nombre = tablaListaDonadores.getValueAt(fila, 1).toString();
+        
+        // VALIDAR SI TIENE DONACIONES (NUEVA VALIDACIÓN)
+        if (tieneDonaciones(idDonador)) {
+            JOptionPane.showMessageDialog(this,
+                "No se puede eliminar el donador porque tiene donaciones registradas.\n" +
+                "Debe eliminar primero las donaciones asociadas a este donador.",
+                "No se puede eliminar", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        int confirmacion = JOptionPane.showConfirmDialog(this, 
+            "¿Está seguro de eliminar al donador?\n\n" +
+            "ID: " + idDonador + "\n" +
+            "Nombre: " + nombre + "\n\n" +
+            "Advertencia: Esta acción no se puede deshacer.",
+            "Confirmar eliminación", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        
+        if (confirmacion == JOptionPane.YES_OPTION) {
+            eliminarDonadorBD(idDonador);
+        }
+    }
+
+    private boolean tieneDonaciones(String idDonador) {
+        String sql = "SELECT COUNT(*) as total FROM Donacion WHERE idDonador = ?";
+        
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setString(1, idDonador);
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                int totalDonaciones = rs.getInt("total");
+                return totalDonaciones > 0;
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this,
+                "Error al verificar donaciones: " + e.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private void eliminarDonadorBD(String idDonador) {
         String sql = "DELETE FROM Donador WHERE idDonador = ?";
         
         try (Connection con = ConexionBD.getConexion();
@@ -489,281 +491,321 @@ private void eliminarDonador() {
             if (filasAfectadas > 0) {
                 JOptionPane.showMessageDialog(this, 
                     "Donador eliminado exitosamente",
-                    "Eliminación exitosa", 
-                    JOptionPane.INFORMATION_MESSAGE);
+                    "Eliminación exitosa", JOptionPane.INFORMATION_MESSAGE);
                 
-
                 cargarTabla();
                 limpiarCampos();
-                
-                // Restaurar estado de botones
                 botonAgregar.setEnabled(true);
                 botonEditar.setEnabled(false);
             }
-            
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, 
                 "Error al eliminar: " + e.getMessage(),
-                "Error de base de datos", 
-                JOptionPane.ERROR_MESSAGE);
+                "Error de base de datos", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
     }
-}
 
-private void buscarDonador(String criterio) {
-    String sql = """
-        SELECT 
-            D.idDonador,
-            D.nombre,
-            D.telefono,
-            D.email,
-            D.direccion,
-            D.anioGraduacion,
-            D.conyuge,
-            D.idCategoria,
-            D.idCorporacion,
-            C.nombre as nombreCategoria,
-            CORP.nombre as nombreCorporacion
-        FROM Donador D
-        LEFT JOIN CategoriaDonador C ON D.idCategoria = C.idCategoria
-        LEFT JOIN Corporacion CORP ON D.idCorporacion = CORP.idCorporacion
-        WHERE D.nombre LIKE ? OR D.idDonador LIKE ? OR D.telefono LIKE ?
-        ORDER BY D.nombre
+    private void buscarDonador(String criterio) {
+        String sql = """
+            SELECT D.idDonador, D.nombre, D.telefono, D.email, D.direccion,
+                   D.anioGraduacion, D.conyuge, D.idCategoria, D.idCorporacion,
+                   C.nombre as nombreCategoria, CORP.nombre as nombreCorporacion
+            FROM Donador D
+            LEFT JOIN CategoriaDonador C ON D.idCategoria = C.idCategoria
+            LEFT JOIN Corporacion CORP ON D.idCorporacion = CORP.idCorporacion
+            WHERE D.nombre LIKE ? OR D.idDonador LIKE ? OR D.telefono LIKE ?
+            ORDER BY D.nombre
         """;
-
-    try (Connection con = ConexionBD.getConexion();
-         PreparedStatement ps = con.prepareStatement(sql)) {
         
-        String parametro = "%" + criterio + "%";
-        ps.setString(1, parametro);
-        ps.setString(2, parametro);
-        ps.setString(3, parametro);
-        
-        ResultSet rs = ps.executeQuery();
-        
-        if (rs.next()) {
-
-            cargarDatosEnFormulario(rs);
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
             
-            JOptionPane.showMessageDialog(this, 
-                "Donador encontrado\n\nID: " + rs.getString("idDonador") + 
-                "\nNombre: " + rs.getString("nombre"),
-                "Búsqueda exitosa", 
-                JOptionPane.INFORMATION_MESSAGE);
+            String parametro = "%" + criterio + "%";
+            ps.setString(1, parametro);
+            ps.setString(2, parametro);
+            ps.setString(3, parametro);
             
-
-            botonAgregar.setEnabled(false);
-            botonEditar.setEnabled(true);
+            ResultSet rs = ps.executeQuery();
             
-        } else {
-            JOptionPane.showMessageDialog(this, 
-                "No se encontró ningún donador con: " + criterio,
-                "Sin resultados", 
-                JOptionPane.INFORMATION_MESSAGE);
-        }
-        
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, 
-            "Error en búsqueda: " + e.getMessage(),
-            "Error", 
-            JOptionPane.ERROR_MESSAGE);
-    }
-}
-
-private void cargarDatosEnFormulario(ResultSet rs) throws SQLException {
-
-    txtIdDonador.setText(rs.getString("idDonador"));
-    txtNombre.setText(rs.getString("nombre"));
-    txtDireccion.setText(rs.getString("direccion"));
-    txtTelefono.setText(rs.getString("telefono"));
-    txtCorreo.setText(rs.getString("email"));
-    txtConyuge.setText(rs.getString("conyuge"));
-    
-
-    int año = rs.getInt("anioGraduacion");
-    if (!rs.wasNull()) {
-        spinnerAñoGraduacion.setValue(año);
-    }
-    
-
-    int idCategoria = rs.getInt("idCategoria");
-    seleccionarItemEnComboBox(combCategoria, idCategoria);
-    
-    int idCorporacion = rs.getInt("idCorporacion");
-    seleccionarItemEnComboBox(comboCorporacion, idCorporacion);
-
-    txtIdDonador.setForeground(new Color(0, 100, 0)); 
-    txtIdDonador.setBackground(new Color(220, 255, 220));
-}
-
-private void seleccionarItemEnComboBox(javax.swing.JComboBox comboBox, int id) {
-    for (int i = 0; i < comboBox.getItemCount(); i++) {
-        Object item = comboBox.getItemAt(i);
-        if (item instanceof CategoriaItem) {
-            CategoriaItem catItem = (CategoriaItem) item;
-            if (catItem.getId() == id) {
-                comboBox.setSelectedIndex(i);
-                break;
+            if (rs.next()) {
+                cargarDatosEnFormulario(rs);
+                JOptionPane.showMessageDialog(this, 
+                    "Donador encontrado\n\nID: " + rs.getString("idDonador") + 
+                    "\nNombre: " + rs.getString("nombre"),
+                    "Búsqueda exitosa", JOptionPane.INFORMATION_MESSAGE);
+                
+                botonAgregar.setEnabled(false);
+                botonEditar.setEnabled(true);
+            } else {
+                JOptionPane.showMessageDialog(this, 
+                    "No se encontró ningún donador con: " + criterio,
+                    "Sin resultados", JOptionPane.INFORMATION_MESSAGE);
             }
-        } else if (item instanceof CorporacionItem) {
-            CorporacionItem corpItem = (CorporacionItem) item;
-            if (corpItem.getId() == id) {
-                comboBox.setSelectedIndex(i);
-                break;
-            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, 
+                "Error en búsqueda: " + e.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-}
 
-private void editarDonador() {
-
-    String idDonador = txtIdDonador.getText().trim();
-    if (idDonador.isEmpty() || idDonador.contains("Presiona") || idDonador.contains("DON")) {
-        JOptionPane.showMessageDialog(this, 
-            "Primero busque un donador para editar",
-            "Advertencia", 
-            JOptionPane.WARNING_MESSAGE);
-        return;
+    private void editarDonador() {
+        String idDonador = txtIdDonador.getText().trim();
+        
+        if (idDonador.isEmpty() || idDonador.contains("Presiona") || idDonador.contains("DON")) {
+            JOptionPane.showMessageDialog(this, 
+                "Primero busque un donador para editar",
+                "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        if (!validarCamposObligatorios()) return;
+        
+        int confirmacion = JOptionPane.showConfirmDialog(this, 
+            "¿Está seguro de actualizar los datos del donador?\n\n" +
+            "ID: " + idDonador + "\n" +
+            "Nombre: " + txtNombre.getText().trim(),
+            "Confirmar actualización", JOptionPane.YES_NO_OPTION);
+        
+        if (confirmacion == JOptionPane.YES_OPTION) {
+            actualizarDonadorEnBD(idDonador);
+        }
     }
-    
-    if (!validarCamposObligatorios()) {
-        return;
-    }
-    
 
-    int confirmacion = JOptionPane.showConfirmDialog(this,
-        "¿Está seguro de actualizar los datos del donador?\n\n" +
-        "ID: " + idDonador + "\n" +
-        "Nombre: " + txtNombre.getText().trim(),
-        "Confirmar actualización", 
-        JOptionPane.YES_NO_OPTION);
-    
-    if (confirmacion == JOptionPane.YES_OPTION) {
-        actualizarDonadorEnBD(idDonador);
-    }
-}
-
-private void actualizarDonadorEnBD(String idDonador) {
-    String sql = """
-        UPDATE Donador SET 
-            nombre = ?, 
-            direccion = ?, 
-            idCategoria = ?, 
-            anioGraduacion = ?, 
-            telefono = ?, 
-            email = ?, 
-            idCorporacion = ?, 
-            conyuge = ?
-        WHERE idDonador = ?
+    private void actualizarDonadorEnBD(String idDonador) {
+        String sql = """
+            UPDATE Donador 
+            SET nombre = ?, direccion = ?, idCategoria = ?, anioGraduacion = ?,
+                telefono = ?, email = ?, idCorporacion = ?, conyuge = ?
+            WHERE idDonador = ?
         """;
-    
-    try (Connection con = ConexionBD.getConexion();
-         PreparedStatement ps = con.prepareStatement(sql)) {
         
-        String nombre = txtNombre.getText().trim();
-        String direccion = txtDireccion.getText().trim();
-        CategoriaItem categoria = (CategoriaItem) combCategoria.getSelectedItem();
-        int añoGraduacion = (Integer) spinnerAñoGraduacion.getValue();
-        String telefono = txtTelefono.getText().trim().replaceAll("[^0-9]", "");
-        String email = txtCorreo.getText().trim();
-        String conyuge = txtConyuge.getText().trim();
-        CorporacionItem corporacion = (CorporacionItem) comboCorporacion.getSelectedItem();
-        
-        ps.setString(1, nombre);
-        ps.setString(2, direccion);
-        ps.setInt(3, categoria.getId());
-        
-        if (añoGraduacion > 0) {
-            ps.setInt(4, añoGraduacion);
-        } else {
-            ps.setNull(4, java.sql.Types.INTEGER);
-        }
-        
-        ps.setString(5, telefono);
-        ps.setString(6, email.isEmpty() ? null : email);
-        
-        // IMPORTANTE: Solo actualizar idCorporacion si es mayor a 0
-        if (corporacion != null && corporacion.getId() > 0) {
-            ps.setInt(7, corporacion.getId());
-        } else {
-            ps.setNull(7, java.sql.Types.INTEGER); // NULL si no seleccionó
-        }
-        
-        ps.setString(8, conyuge.isEmpty() ? null : conyuge);
-        ps.setString(9, idDonador);
-        
-        int filasAfectadas = ps.executeUpdate();
-        
-        if (filasAfectadas > 0) {
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            String nombre = txtNombre.getText().trim();
+            String direccion = txtDireccion.getText().trim();
+            CategoriaItem categoria = (CategoriaItem) combCategoria.getSelectedItem();
+            int añoGraduacion = (Integer) spinnerAñoGraduacion.getValue();
+            String telefono = txtTelefono.getText().trim().replaceAll("[^0-9]", "");
+            String email = txtCorreo.getText().trim();
+            String conyuge = txtConyuge.getText().trim();
+            CorporacionItem corporacion = (CorporacionItem) comboCorporacion.getSelectedItem();
+            
+            ps.setString(1, nombre);
+            ps.setString(2, direccion);
+            ps.setInt(3, categoria.getId());
+            
+            if (añoGraduacion > 0) {
+                ps.setInt(4, añoGraduacion);
+            } else {
+                ps.setNull(4, java.sql.Types.INTEGER);
+            }
+            
+            ps.setString(5, telefono);
+            ps.setString(6, email.isEmpty() ? null : email);
+            
+            if (corporacion != null && corporacion.getId() > 0) {
+                ps.setInt(7, corporacion.getId());
+            } else {
+                ps.setNull(7, java.sql.Types.INTEGER);
+            }
+            
+            ps.setString(8, conyuge.isEmpty() ? null : conyuge);
+            ps.setString(9, idDonador);
+            
+            int filasAfectadas = ps.executeUpdate();
+            
+            if (filasAfectadas > 0) {
+                JOptionPane.showMessageDialog(this, 
+                    "Donador actualizado exitosamente",
+                    "Actualización exitosa", JOptionPane.INFORMATION_MESSAGE);
+                
+                cargarTabla();
+                limpiarCampos();
+                botonAgregar.setEnabled(true);
+                botonEditar.setEnabled(false);
+            } else {
+                JOptionPane.showMessageDialog(this, 
+                    "No se pudo actualizar el donador",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, 
-                "Donador actualizado exitosamente",
-                "Actualización exitosa", 
-                JOptionPane.INFORMATION_MESSAGE);
-            
-            cargarTabla();
-            limpiarCampos();
-            
-            botonAgregar.setEnabled(true);
-            botonEditar.setEnabled(false);
-            
-        } else {
-            JOptionPane.showMessageDialog(this, 
-                "No se pudo actualizar el donador",
-                "Error", 
-                JOptionPane.ERROR_MESSAGE);
+                "Error al actualizar: " + e.getMessage(),
+                "Error de base de datos", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+
+    // ================== MÉTODOS AUXILIARES ==================
+    
+    private void cargarDatosEnFormulario(ResultSet rs) throws SQLException {
+        txtIdDonador.setText(rs.getString("idDonador"));
+        txtNombre.setText(rs.getString("nombre"));
+        txtDireccion.setText(rs.getString("direccion"));
+        txtTelefono.setText(rs.getString("telefono"));
+        txtCorreo.setText(rs.getString("email"));
+        txtConyuge.setText(rs.getString("conyuge"));
+        
+        int año = rs.getInt("anioGraduacion");
+        if (!rs.wasNull()) {
+            spinnerAñoGraduacion.setValue(año);
         }
         
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, 
-            "Error al actualizar: " + e.getMessage(),
-            "Error de base de datos", 
-            JOptionPane.ERROR_MESSAGE);
-        e.printStackTrace();
+        int idCategoria = rs.getInt("idCategoria");
+        seleccionarItemEnComboBox(combCategoria, idCategoria);
+        
+        int idCorporacion = rs.getInt("idCorporacion");
+        seleccionarItemEnComboBox(comboCorporacion, idCorporacion);
+        
+        txtIdDonador.setForeground(new Color(0, 100, 0));
+        txtIdDonador.setBackground(new Color(220, 255, 220));
     }
-}
-private void limpiarCampos() {
-    txtIdDonador.setText("Presiona Generar ID");
-    txtIdDonador.setForeground(Color.GRAY);
-    txtIdDonador.setBackground(Color.WHITE);
+
+    private void seleccionarItemEnComboBox(javax.swing.JComboBox comboBox, int id) {
+        for (int i = 0; i < comboBox.getItemCount(); i++) {
+            Object item = comboBox.getItemAt(i);
+            
+            if (item instanceof CategoriaItem) {
+                CategoriaItem catItem = (CategoriaItem) item;
+                if (catItem.getId() == id) {
+                    comboBox.setSelectedIndex(i);
+                    break;
+                }
+            } else if (item instanceof CorporacionItem) {
+                CorporacionItem corpItem = (CorporacionItem) item;
+                if (corpItem.getId() == id) {
+                    comboBox.setSelectedIndex(i);
+                    break;
+                }
+            }
+        }
+    }
+
+    private String generarIdDonador(String nombreCompleto) {
+        String limpio = nombreCompleto.trim().toUpperCase()
+            .replaceAll("[ÁÀÄÂ]", "A")
+            .replaceAll("[ÉÈËÊ]", "E")
+            .replaceAll("[ÍÌÏÎ]", "I")
+            .replaceAll("[ÓÒÖÔ]", "O")
+            .replaceAll("[ÚÙÜÛ]", "U")
+            .replaceAll("[^A-Z\\s]", " ");
+        
+        String[] partes = limpio.split("\\s+");
+        String iniciales = "DON";
+        
+        if (partes.length >= 3) {
+            iniciales = "" + partes[0].charAt(0) + partes[1].charAt(0) + partes[2].charAt(0);
+        } else if (partes.length == 2) {
+            iniciales = "" + partes[0].charAt(0) + partes[1].charAt(0);
+        } else if (partes.length == 1 && partes[0].length() >= 3) {
+            iniciales = partes[0].substring(0, 3);
+        }
+        
+        String año = String.format("%02d", java.time.Year.now().getValue() % 100);
+        String prefijo = iniciales + año;
+        
+        String sql = """
+            SELECT ISNULL(MAX(CAST(RIGHT(idDonador, 3) AS INT)), 0) + 1 AS siguiente
+            FROM Donador 
+            WHERE idDonador LIKE ?
+        """;
+        
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setString(1, prefijo + "-%");
+            ResultSet rs = ps.executeQuery();
+            
+            int siguiente = 1;
+            if (rs.next()) {
+                siguiente = rs.getInt("siguiente");
+            }
+            
+            return prefijo + "-" + String.format("%03d", siguiente);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return prefijo + "-001";
+        }
+    }
+
+    private void limpiarCampos() {
+        txtIdDonador.setText("Presiona Generar ID");
+        txtIdDonador.setForeground(Color.GRAY);
+        txtIdDonador.setBackground(Color.WHITE);
+        
+        txtNombre.setText("");
+        txtNombre.setBackground(Color.WHITE);
+        
+        txtDireccion.setText("");
+        txtDireccion.setBackground(Color.WHITE);
+        
+        combCategoria.setSelectedIndex(0);
+        combCategoria.setBackground(Color.WHITE);
+        
+        spinnerAñoGraduacion.setValue(2025);
+        if (spinnerAñoGraduacion.isEnabled()) {
+            spinnerAñoGraduacion.setBackground(Color.WHITE);
+        } else {
+            spinnerAñoGraduacion.setBackground(Color.LIGHT_GRAY);
+        }
+        
+        txtTelefono.setText("");
+        txtTelefono.setBackground(Color.WHITE);
+        
+        txtCorreo.setText("");
+        txtCorreo.setBackground(Color.WHITE);
+        
+        if (comboCorporacion != null) {
+            comboCorporacion.setSelectedIndex(0);
+            comboCorporacion.setBackground(Color.WHITE);
+        }
+        
+        txtConyuge.setText("");
+        botonAgregar.setEnabled(true);
+        botonEditar.setEnabled(false);
+        tablaListaDonadores.clearSelection();
+        txtNombre.requestFocus();
+    }
+
+    // ================== CLASES INTERNAS ==================
     
-    txtNombre.setText("");
-    txtNombre.setBackground(Color.WHITE);
-    
-    txtDireccion.setText("");
-    txtDireccion.setBackground(Color.WHITE);
-    
-    combCategoria.setSelectedIndex(0);
-    combCategoria.setBackground(Color.WHITE);
-    
-    spinnerAñoGraduacion.setValue(2025);
-    if (spinnerAñoGraduacion.isEnabled()) {
-        spinnerAñoGraduacion.setBackground(Color.WHITE);
-    } else {
-        spinnerAñoGraduacion.setBackground(Color.LIGHT_GRAY);
+    class CategoriaItem {
+        private int id;
+        private String nombre;
+        
+        public CategoriaItem(int id, String nombre) {
+            this.id = id;
+            this.nombre = nombre;
+        }
+        
+        public int getId() { return id; }
+        public String getNombre() { return nombre; }
+        
+        @Override
+        public String toString() {
+            return nombre;
+        }
     }
     
-    txtTelefono.setText("");
-    txtTelefono.setBackground(Color.WHITE);
-    
-    txtCorreo.setText("");
-    txtCorreo.setBackground(Color.WHITE);
-    
-    // Limpiar corporación pero SIN poner fondo rojo
-    if (comboCorporacion != null) {
-        comboCorporacion.setSelectedIndex(0);
-        comboCorporacion.setBackground(Color.WHITE); // Color normal
+    class CorporacionItem {
+        private int id;
+        private String nombre;
+        
+        public CorporacionItem(int id, String nombre) {
+            this.id = id;
+            this.nombre = nombre;
+        }
+        
+        public int getId() { return id; }
+        public String getNombre() { return nombre; }
+        
+        @Override
+        public String toString() {
+            return nombre;
+        }
     }
-    
-    txtConyuge.setText("");
-    
-    botonAgregar.setEnabled(true);
-    botonEditar.setEnabled(false);
-    
-    tablaListaDonadores.clearSelection();
-    
-    txtNombre.requestFocus();
-}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

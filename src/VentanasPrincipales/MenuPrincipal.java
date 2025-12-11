@@ -26,6 +26,42 @@ public class MenuPrincipal extends javax.swing.JFrame {
         initComponents();
         setLocationRelativeTo(null);
         this.getContentPane().setBackground(new Color(224, 224, 224));
+        java.util.List<java.awt.Component> orden = java.util.Arrays.asList(
+    botonGestion,
+    botonEventos,
+    botonGestionPagos,
+    botonConfig,
+    botonCerrarSesion
+);
+
+setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
+    @Override
+    public java.awt.Component getComponentAfter(java.awt.Container aContainer, java.awt.Component aComponent) {
+        int i = orden.indexOf(aComponent);
+        return orden.get((i + 1) % orden.size());
+    }
+
+    @Override
+    public java.awt.Component getComponentBefore(java.awt.Container aContainer, java.awt.Component aComponent) {
+        int i = orden.indexOf(aComponent);
+        return orden.get((i - 1 + orden.size()) % orden.size());
+    }
+
+    @Override
+    public java.awt.Component getFirstComponent(java.awt.Container aContainer) {
+        return orden.get(0);
+    }
+
+    @Override
+    public java.awt.Component getLastComponent(java.awt.Container aContainer) {
+        return orden.get(orden.size() - 1);
+    }
+
+    @Override
+    public java.awt.Component getDefaultComponent(java.awt.Container aContainer) {
+        return orden.get(0);
+    }
+});
     }
 
     /**
@@ -48,6 +84,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         botonGestionPagos = new javax.swing.JButton();
         jLabel12 = new javax.swing.JLabel();
         botonConfig = new javax.swing.JButton();
+        botonListados = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 204));
@@ -135,6 +172,10 @@ public class MenuPrincipal extends javax.swing.JFrame {
             }
         });
 
+        botonListados.setBackground(new java.awt.Color(0, 153, 153));
+        botonListados.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\arrow-up-right.png")); // NOI18N
+        botonListados.setText("Ingresar a Listados");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -142,7 +183,8 @@ public class MenuPrincipal extends javax.swing.JFrame {
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(botonCerrarSesion)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(botonListados))
             .addGroup(layout.createSequentialGroup()
                 .addGap(47, 47, 47)
                 .addComponent(botonGestion)
@@ -194,7 +236,9 @@ public class MenuPrincipal extends javax.swing.JFrame {
                     .addComponent(botonGestionPagos)
                     .addComponent(botonConfig))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 66, Short.MAX_VALUE)
-                .addComponent(botonCerrarSesion))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(botonCerrarSesion)
+                    .addComponent(botonListados)))
         );
 
         pack();
@@ -262,6 +306,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private javax.swing.JButton botonEventos;
     private javax.swing.JButton botonGestion;
     private javax.swing.JButton botonGestionPagos;
+    private javax.swing.JButton botonListados;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

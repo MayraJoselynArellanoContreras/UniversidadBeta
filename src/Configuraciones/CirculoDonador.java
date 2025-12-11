@@ -29,6 +29,45 @@ public class CirculoDonador extends javax.swing.JFrame {
         initComponents();
         setLocationRelativeTo(null);
          cargarTabla();
+         // --- Configurar navegación por tabulación ---
+this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
+    @Override
+    public java.awt.Component getComponentAfter(java.awt.Container aContainer, java.awt.Component aComponent) {
+
+        if (aComponent.equals(txtNombreCirculo)) return txtMontoMinimo;
+        if (aComponent.equals(txtMontoMinimo)) return txtMontoMaximo;
+        if (aComponent.equals(txtMontoMaximo)) return botonRegistrar;
+        if (aComponent.equals(botonRegistrar)) return botonEditar;
+        if (aComponent.equals(botonEditar)) return botonEliminar;
+        if (aComponent.equals(botonEliminar)) return botonBuscar;
+        if (aComponent.equals(botonBuscar)) return botonLimpiar;
+        if (aComponent.equals(botonLimpiar)) return botonVolver;
+        if (aComponent.equals(botonVolver)) return tablaCirculos;
+
+        return txtNombreCirculo; // inicio del ciclo
+    }
+
+    @Override
+    public java.awt.Component getComponentBefore(java.awt.Container aContainer, java.awt.Component aComponent) {
+
+        if (aComponent.equals(txtMontoMinimo)) return txtNombreCirculo;
+        if (aComponent.equals(txtMontoMaximo)) return txtMontoMinimo;
+        if (aComponent.equals(botonRegistrar)) return txtMontoMaximo;
+        if (aComponent.equals(botonEditar)) return botonRegistrar;
+        if (aComponent.equals(botonEliminar)) return botonEditar;
+        if (aComponent.equals(botonBuscar)) return botonEliminar;
+        if (aComponent.equals(botonLimpiar)) return botonBuscar;
+        if (aComponent.equals(botonVolver)) return botonLimpiar;
+        if (aComponent.equals(tablaCirculos)) return botonVolver;
+
+        return tablaCirculos; // final del ciclo
+    }
+
+    @Override public java.awt.Component getDefaultComponent(java.awt.Container aContainer) { return txtNombreCirculo; }
+    @Override public java.awt.Component getFirstComponent(java.awt.Container aContainer) { return txtNombreCirculo; }
+    @Override public java.awt.Component getLastComponent(java.awt.Container aContainer) { return tablaCirculos; }
+});
+
         botonEditar.setEnabled(false);
 
         this.getContentPane().setBackground(new Color(182, 197, 179));
