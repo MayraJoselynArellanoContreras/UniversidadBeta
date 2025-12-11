@@ -266,8 +266,11 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="2" name="C:\Users\contr\Downloads\arrow-up-right.png"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Ingresar a Listados"/>
+        <Property name="text" type="java.lang.String" value="Ingresar a detalles"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="botonListadosActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

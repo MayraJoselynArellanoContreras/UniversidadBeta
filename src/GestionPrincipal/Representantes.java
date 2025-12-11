@@ -31,9 +31,7 @@ public Representantes() {
     this.getContentPane().setBackground(new Color(182, 197, 179));
     cargarGeneraciones();
     cargarTabla();
-    // ======================================
-// ORDEN PERSONALIZADO DE TABULACIÓN
-// ======================================
+
 java.util.List<java.awt.Component> ordenTab = java.util.Arrays.asList(
         txtIdRepresentante,
         txtNombre,
@@ -45,7 +43,7 @@ java.util.List<java.awt.Component> ordenTab = java.util.Arrays.asList(
         botonEliminar,
         botonBuscar,
         botonLimpiar,
-        botonVolver,       // si no existe, eliminar esta línea
+        botonVolver,     
         tablaRepresentantes
 );
 
@@ -82,7 +80,7 @@ this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
 });
 
     
-    // Agregar listener para doble clic en tabla
+
     tablaRepresentantes.addMouseListener(new java.awt.event.MouseAdapter() {
         @Override
         public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -93,7 +91,7 @@ this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
     });
 }
 
-// Clase para manejar items de generación
+
 class GeneracionItem {
     private int anio;
     private String display;
@@ -115,7 +113,6 @@ class GeneracionItem {
     }
 }
 
-// Cargar generaciones en el ComboBox
 private void cargarGeneraciones() {
     String sql = """
         SELECT DISTINCT anioGraduacion 
@@ -136,7 +133,7 @@ private void cargarGeneraciones() {
             comboGeneracion.addItem(new GeneracionItem(anio));
         }
         
-        // Agregar años adicionales si no están
+
         int añoActual = java.time.Year.now().getValue();
         for (int i = añoActual; i >= 1990; i--) {
             boolean existe = false;
@@ -159,18 +156,18 @@ private void cargarGeneraciones() {
     }
 }
 
-// Validar campos obligatorios
+
 private boolean validarCamposObligatorios() {
     StringBuilder errores = new StringBuilder();
     boolean hayErrores = false;
     
-    // Resetear colores
+
     txtNombre.setBackground(Color.WHITE);
     comboGeneracion.setBackground(Color.WHITE);
     txtTelefono.setBackground(Color.WHITE);
     txtEmail.setBackground(Color.WHITE);
     
-    // Validar nombre
+
     String nombre = txtNombre.getText().trim();
     if (nombre.isEmpty()) {
         errores.append("• El nombre es obligatorio\n");
@@ -178,7 +175,7 @@ private boolean validarCamposObligatorios() {
         hayErrores = true;
     }
 
-    // Validar generación
+
     GeneracionItem generacion = (GeneracionItem) comboGeneracion.getSelectedItem();
     if (generacion.getAnio() == 0) {
         errores.append("• Debe seleccionar una generación\n");
@@ -186,7 +183,7 @@ private boolean validarCamposObligatorios() {
         hayErrores = true;
     }
 
-    // Validar teléfono
+
     String telefono = txtTelefono.getText().trim();
     if (telefono.isEmpty()) {
         errores.append("• El teléfono es obligatorio\n");
@@ -201,7 +198,7 @@ private boolean validarCamposObligatorios() {
         }
     }
 
-    // Validar email (opcional)
+
     String email = txtEmail.getText().trim();
     if (!email.isEmpty()) {
         if (!email.contains("@") || !email.contains(".") || email.length() < 5) {
@@ -211,7 +208,7 @@ private boolean validarCamposObligatorios() {
         }
     }
     
-    // Mostrar errores si hay
+
     if (hayErrores) {
         JOptionPane.showMessageDialog(this, 
             "Por favor complete los siguientes campos:\n\n" + errores.toString(), 
@@ -223,7 +220,7 @@ private boolean validarCamposObligatorios() {
     return true;
 }
 
-// Cargar tabla de representantes
+
 private void cargarTabla() {
     String sql = """
         SELECT 
@@ -280,7 +277,7 @@ private void cargarTabla() {
     }
 }
 
-// Agregar nuevo representante
+
 private void agregarRepresentante() {
     if (!validarCamposObligatorios()) {
         return;
@@ -334,7 +331,7 @@ private void agregarRepresentante() {
     }
 }
 
-// Buscar representante por ID (para botón buscar)
+
 private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {
     String idStr = JOptionPane.showInputDialog(this,
         "Ingrese ID del representante:",
@@ -356,7 +353,7 @@ private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {
     }
 }
 
-// Método principal de búsqueda por ID
+
 private void buscarRepresentantePorID(int idRepresentante) {
     String sql = """
         SELECT 
@@ -403,7 +400,7 @@ private void buscarRepresentantePorID(int idRepresentante) {
     }
 }
 
-// Cargar representante desde tabla (doble clic)
+
 private void cargarRepresentanteDesdeTabla() {
     int fila = tablaRepresentantes.getSelectedRow();
     if (fila == -1) {
@@ -418,7 +415,7 @@ private void cargarRepresentanteDesdeTabla() {
     buscarRepresentantePorID(idRepresentante);
 }
 
-// Cargar datos en formulario
+
 private void cargarDatosEnFormulario(ResultSet rs) throws SQLException {
     txtIdRepresentante.setText(String.valueOf(rs.getInt("idRepresentante")));
     txtNombre.setText(rs.getString("nombre"));
@@ -431,7 +428,7 @@ private void cargarDatosEnFormulario(ResultSet rs) throws SQLException {
     botonAgregar.setText("Actualizar Representante");
 }
 
-// Seleccionar generación en ComboBox
+
 private void seleccionarGeneracion(int anio) {
     for (int i = 0; i < comboGeneracion.getItemCount(); i++) {
         GeneracionItem item = (GeneracionItem) comboGeneracion.getItemAt(i);
@@ -443,7 +440,7 @@ private void seleccionarGeneracion(int anio) {
     comboGeneracion.setSelectedIndex(0);
 }
 
-// Editar representante
+
 private void editarRepresentante() {
     String idStr = txtIdRepresentante.getText().trim();
     if (idStr.isEmpty()) {
@@ -470,7 +467,7 @@ private void editarRepresentante() {
     }
 }
 
-// Actualizar en base de datos
+
 private void actualizarRepresentanteEnBD(int idRepresentante) {
     String sql = """
         UPDATE RepresentanteClase SET 
@@ -525,7 +522,7 @@ private void actualizarRepresentanteEnBD(int idRepresentante) {
     }
 }
 
-// Eliminar representante
+
 private void eliminarRepresentante() {
     int fila = tablaRepresentantes.getSelectedRow();
     if (fila == -1) {
@@ -582,7 +579,7 @@ private void eliminarRepresentante() {
     }
 }
 
-// Limpiar campos del formulario
+
 private void limpiarCampos() {
     txtIdRepresentante.setText("");
     txtNombre.setText("");
@@ -591,25 +588,25 @@ private void limpiarCampos() {
     
     comboGeneracion.setSelectedIndex(0);
     
-    // Restaurar colores
+
     txtNombre.setBackground(Color.WHITE);
     comboGeneracion.setBackground(Color.WHITE);
     txtTelefono.setBackground(Color.WHITE);
     txtEmail.setBackground(Color.WHITE);
     
-    // Restaurar botones
+
     botonAgregar.setText("Agregar Representante");
     botonAgregar.setEnabled(true);
     botonEditar.setEnabled(false);
     
-    // Deseleccionar tabla
+
     tablaRepresentantes.clearSelection();
     
-    // Poner foco en nombre
+
     txtNombre.requestFocus();
 }
 
-// Botón Nuevo (opcional)
+
 private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {
     limpiarCampos();
 }
@@ -657,17 +654,16 @@ private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(111, 111, 111)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(184, 184, 184))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(12, Short.MAX_VALUE)
-                .addComponent(jLabel1)
-                .addContainerGap())
+                .addGap(0, 18, Short.MAX_VALUE)
+                .addComponent(jLabel1))
         );
 
         jLabel2.setText("Nombre: ");

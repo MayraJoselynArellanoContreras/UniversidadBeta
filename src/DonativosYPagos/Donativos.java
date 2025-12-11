@@ -30,7 +30,7 @@ public class Donativos extends javax.swing.JFrame {
      */
     public Donativos() {
         initComponents();
-        // --- Configurar navegación por tabulación ---
+
 this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
 
     @Override
@@ -52,7 +52,7 @@ this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
         if (aComponent.equals(botonEliminarDonativo)) return tablaHistorial;
         if (aComponent.equals(tablaHistorial)) return botonVolver;
 
-        return txtIdDonativo; // inicio del ciclo
+        return txtIdDonativo;
     }
 
     @Override
@@ -74,7 +74,7 @@ this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
         if (aComponent.equals(tablaHistorial)) return botonEliminarDonativo;
         if (aComponent.equals(botonVolver)) return tablaHistorial;
 
-        return botonVolver; // final del ciclo
+        return botonVolver;
     }
 
     @Override public java.awt.Component getDefaultComponent(java.awt.Container c) { return txtIdDonativo; }
@@ -91,7 +91,7 @@ this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
         habilitarCampoTarjeta();
     }
     
-    // Clases internas para manejo de items en combos
+
     class CorporacionItem {
         private int id;
         private String nombre;
@@ -214,7 +214,7 @@ private void cargarTabla() {
                 rs.getString("donador"),
                 rs.getString("corporacion"),
                 rs.getString("Observaciones"),
-                rs.getString("circuloDonador")  // Mostrar círculo
+                rs.getString("circuloDonador") 
             });
         }
         
@@ -244,7 +244,7 @@ private void cargarTabla() {
         StringBuilder errores = new StringBuilder();
         boolean hayErrores = false;
         
-        // Validar donador
+
         String idDonador = txtIdGarantia.getText().trim();
         if (idDonador.isEmpty() || txtNombreDonador.getText().trim().isEmpty()) {
             errores.append("• Debe buscar y seleccionar un donador\n");
@@ -252,7 +252,7 @@ private void cargarTabla() {
             hayErrores = true;
         }
         
-        // Validar fecha de la garantia
+
         String fecha = txtFechaGarantia.getText().trim();
         if (fecha.isEmpty() || fecha.equals("dd/mm/aaaa")) {
             errores.append("• La fecha es obligatoria\n");
@@ -264,7 +264,7 @@ private void cargarTabla() {
             hayErrores = true;
         }
         
-        // Validar fecha de registro del donativo
+
         String fechaR = txtFechaRegistro.getText().trim();
         if (fecha.isEmpty() || fecha.equals("dd/mm/aaaa")) {
             errores.append("• La fecha es obligatoria\n");
@@ -276,7 +276,7 @@ private void cargarTabla() {
             hayErrores = true;
         }
         
-        // Validar cantidades
+
         String cantidadG = txtCantidadGarantizada.getText().trim();
         if (cantidadG.isEmpty()) {
             errores.append("• La cantidad garantizada es obligatoria\n");
@@ -317,7 +317,7 @@ private void cargarTabla() {
             }
         }
         
-        // Validar método de pago
+
         if (comboMetodo.getSelectedIndex() <= 0) {
             errores.append("• Debe seleccionar un método de pago\n");
             comboMetodo.setBackground(new Color(255, 200, 200));
@@ -338,14 +338,14 @@ private void cargarTabla() {
             }
         }
         
-        // Validar número de pagos
+
         if (comboNumPagos.getSelectedIndex() <= 0) {
             errores.append("• Debe seleccionar número de pagos\n");
             comboNumPagos.setBackground(new Color(255, 200, 200));
             hayErrores = true;
         }
         
-        // Validar corporación
+
         if (comboCorporacion.getSelectedIndex() <= 0) {
             errores.append("• Debe seleccionar una corporación\n");
             comboCorporacion.setBackground(new Color(255, 200, 200));
@@ -421,7 +421,7 @@ private void cargarTabla() {
         return;
     }
     
-    // Verificar qué dice el botón
+
     String textoBoton = botonRegistrar.getText();
     
     if (textoBoton.equals("Registrar Donativo")) {
@@ -429,7 +429,7 @@ private void cargarTabla() {
     } else if (textoBoton.equals("Actualizar Donativo")) {
         actualizarDonativo();
     } else {
-        // Por defecto, registrar como nuevo
+
         guardarNuevoDonativo();
     }
 }
@@ -442,7 +442,7 @@ private void guardarNuevoDonativo() {
     Connection con = null;
     try {
         con = ConexionBD.getConexion();
-        con.setAutoCommit(false); // Iniciar transacción
+        con.setAutoCommit(false); 
         
         // 1. Insertar el donativo
         String sqlDonativo = """
@@ -486,10 +486,8 @@ private void guardarNuevoDonativo() {
                     idGenerado = rs.getInt(1);
                 }
                 
-                // 2. ACTUALIZAR TOTAL DONADO Y CÍRCULO DEL DONADOR
                 actualizarCirculoDonador(con, idDonador, cantidadRecibida);
-                
-                // Confirmar transacción
+
                 con.commit();
                 
                 JOptionPane.showMessageDialog(this,
@@ -509,7 +507,7 @@ private void guardarNuevoDonativo() {
     } catch (SQLException e) {
         try {
             if (con != null) {
-                con.rollback(); // Revertir en caso de error
+                con.rollback(); 
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -534,7 +532,7 @@ private void guardarNuevoDonativo() {
 }
 
 private void actualizarCirculoDonador(Connection con, String idDonador, BigDecimal montoDonativo) throws SQLException {
-    // 1. Sumar al total donado
+
     String sqlSumar = """
         UPDATE Donador 
         SET totalDonado = ISNULL(totalDonado, 0) + ?
@@ -547,7 +545,7 @@ private void actualizarCirculoDonador(Connection con, String idDonador, BigDecim
         ps.executeUpdate();
     }
     
-    // 2. Obtener el nuevo total donado
+
     String sqlObtenerTotal = """
         SELECT ISNULL(totalDonado, 0) as total 
         FROM Donador 
@@ -563,7 +561,7 @@ private void actualizarCirculoDonador(Connection con, String idDonador, BigDecim
         }
     }
     
-    // 3. Calcular y actualizar el círculo basado en el total acumulado
+ 
     String circulo = calcularCirculoDonador(totalDonado);
     
     String sqlActualizarCirculo = """
@@ -578,7 +576,7 @@ private void actualizarCirculoDonador(Connection con, String idDonador, BigDecim
         ps.executeUpdate();
     }
     
-    // Opcional: Mostrar en consola el cambio
+
     System.out.println("Donador " + idDonador + 
                       " - Total donado: $" + String.format("%,.2f", totalDonado) + 
                       " - Círculo: " + circulo);
@@ -600,7 +598,7 @@ private void actualizarDonativo() {
         con = ConexionBD.getConexion();
         con.setAutoCommit(false);
         
-        // 1. Obtener el monto anterior del donativo
+
         String sqlObtenerAnterior = """
             SELECT cantidadRecibida, idDonador 
             FROM Donativo 
@@ -619,7 +617,7 @@ private void actualizarDonativo() {
             }
         }
         
-        // 2. Actualizar el donativo
+
         BigDecimal nuevoMonto = new BigDecimal(txtCantidadRecibida.getText().trim());
         String sqlActualizar = """
             UPDATE Donativo SET
@@ -654,11 +652,11 @@ private void actualizarDonativo() {
             int filas = ps.executeUpdate();
             
             if (filas > 0 && !idDonador.isEmpty()) {
-                // 3. Ajustar el total donado (nuevo - anterior)
+
                 BigDecimal diferencia = nuevoMonto.subtract(montoAnterior);
                 
                 if (!diferencia.equals(BigDecimal.ZERO)) {
-                    // Actualizar total donado
+
                     String sqlAjustarTotal = """
                         UPDATE Donador 
                         SET totalDonado = ISNULL(totalDonado, 0) + ?
@@ -671,7 +669,7 @@ private void actualizarDonativo() {
                         ps2.executeUpdate();
                     }
                     
-                    // Recalcular círculo
+
                     String sqlObtenerTotal = """
                         SELECT ISNULL(totalDonado, 0) as total 
                         FROM Donador 
@@ -786,7 +784,7 @@ private void eliminarDonativo() {
         con = ConexionBD.getConexion();
         con.setAutoCommit(false);
         
-        // 1. Obtener datos del donativo antes de eliminar
+
         String sqlObtenerDatos = """
             SELECT cantidadRecibida, idDonador 
             FROM Donativo 
@@ -805,7 +803,7 @@ private void eliminarDonativo() {
             }
         }
         
-        // 2. Eliminar el donativo
+
         String sqlEliminar = "DELETE FROM Donativo WHERE idDonativo = ?";
         
         try (PreparedStatement ps = con.prepareStatement(sqlEliminar)) {
@@ -813,7 +811,6 @@ private void eliminarDonativo() {
             int filas = ps.executeUpdate();
             
             if (filas > 0 && !idDonador.isEmpty()) {
-                // 3. Restar del total donado
                 String sqlRestarTotal = """
                     UPDATE Donador 
                     SET totalDonado = ISNULL(totalDonado, 0) - ?
@@ -826,7 +823,7 @@ private void eliminarDonativo() {
                     ps2.executeUpdate();
                 }
                 
-                // 4. Recalcular círculo
+
                 String sqlObtenerTotal = """
                     SELECT ISNULL(totalDonado, 0) as total 
                     FROM Donador 
@@ -922,7 +919,7 @@ private void buscarGarantiaEnBD(String idGarantia) {
         ResultSet rs = ps.executeQuery();
         
         if (rs.next()) {
-            // Autocompletar ID y nombre del donador
+
             txtIdGarantia.setText(rs.getString("idDonador"));
             txtNombreDonador.setText(rs.getString("nombreDonador"));
             
@@ -977,11 +974,10 @@ private void buscarGarantiaEnBD(String idGarantia) {
         }
     }
         
-        // Cantidades
+
         txtCantidadGarantizada.setText(rs.getBigDecimal("cantidadGarantizada").toString());
         txtCantidadRecibida.setText(rs.getBigDecimal("cantidadRecibida").toString());
         
-        // Método de pago
         String metodo = rs.getString("metodoPago");
         for (int i = 0; i < comboMetodo.getItemCount(); i++) {
             if (comboMetodo.getItemAt(i).equals(metodo)) {
@@ -990,7 +986,7 @@ private void buscarGarantiaEnBD(String idGarantia) {
             }
         }
         
-        // Número de pagos
+
         String numPagos = String.valueOf(rs.getInt("numeroPagos"));
         for (int i = 0; i < comboNumPagos.getItemCount(); i++) {
             if (comboNumPagos.getItemAt(i).equals(numPagos)) {
@@ -999,13 +995,13 @@ private void buscarGarantiaEnBD(String idGarantia) {
             }
         }
         
-        // Tarjeta
+
         String tarjeta = rs.getString("numeroTarjeta");
         if (tarjeta != null) {
             txtNumTDC.setText(tarjeta);
         }
         
-        // Corporación
+
         int idCorp = rs.getInt("idCorporacion");
         for (int i = 0; i < comboCorporacion.getItemCount(); i++) {
             Object item = comboCorporacion.getItemAt(i);
@@ -1018,7 +1014,7 @@ private void buscarGarantiaEnBD(String idGarantia) {
             }
         }
         
-        // Observaciones
+
         txtObservaciones.setText(rs.getString("Observaciones"));
     }
     
@@ -1037,7 +1033,7 @@ private void editarDonativoDesdeTabla() {
 }
     
  private void limpiarCampos() {
-    // SIEMPRE cargar el próximo ID para nuevo registro
+
     cargarProximoIdDonativo();
     
     txtIdGarantia.setText("");
@@ -1056,11 +1052,11 @@ private void editarDonativoDesdeTabla() {
     txtNumTDC.setEnabled(false);
     txtNumTDC.setBackground(new Color(240, 240, 240));
     
-    // Asegurar que el botón dice "Registrar"
+
     botonRegistrar.setText("Registrar Donativo");
     tablaHistorial.clearSelection();
     
-    // Restaurar colores de fondo
+
     txtIdGarantia.setBackground(Color.WHITE);
     txtFechaGarantia.setBackground(Color.WHITE);
     txtCantidadGarantizada.setBackground(Color.WHITE);
@@ -1071,7 +1067,7 @@ private void editarDonativoDesdeTabla() {
     
 }
     
-    // Agregar este método en tu clase Donativos.java
+
 private String calcularCirculoDonador(BigDecimal montoDonativo) {
     double monto = montoDonativo.doubleValue();
     

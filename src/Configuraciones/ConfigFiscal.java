@@ -24,7 +24,7 @@ public class ConfigFiscal extends javax.swing.JFrame {
      */
     public ConfigFiscal() {
         initComponents();
-        // --- Configurar navegación por tabulación ---
+
 this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
     @Override
     public java.awt.Component getComponentAfter(java.awt.Container aContainer, java.awt.Component aComponent) {
@@ -40,7 +40,7 @@ this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
         if (aComponent.equals(botonEliminar)) return tablaAnios;
         if (aComponent.equals(tablaAnios)) return botonVolver;
 
-        return txtID; // inicio del ciclo
+        return txtID; 
     }
 
     @Override
@@ -57,7 +57,7 @@ this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
         if (aComponent.equals(tablaAnios)) return botonEliminar;
         if (aComponent.equals(botonVolver)) return tablaAnios;
 
-        return botonVolver; // final del ciclo
+        return botonVolver; 
     }
 
     @Override public java.awt.Component getDefaultComponent(java.awt.Container aContainer) { return txtID; }
@@ -81,7 +81,7 @@ this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
         };
         tablaAnios.setModel(modeloTabla);
         
-        // Doble clic para cargar datos
+
         tablaAnios.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -96,7 +96,7 @@ this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
         Calendar cal = Calendar.getInstance();
         int añoActual = cal.get(Calendar.YEAR);
         
-        if (cal.get(Calendar.MONTH) >= 6) { // Julio o después
+        if (cal.get(Calendar.MONTH) >= 6) { 
             txtFechaInicio.setText(añoActual + "-07-01");
             txtFechaFin.setText((añoActual + 1) + "-06-30");
             txtNombre.setText(añoActual + "-" + (añoActual + 1));
@@ -198,20 +198,20 @@ this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
             return false;
         }
         
-        // Validar formato de fecha
+
         if (!txtFechaInicio.getText().matches("\\d{4}-\\d{2}-\\d{2}") || 
             !txtFechaFin.getText().matches("\\d{4}-\\d{2}-\\d{2}")) {
             JOptionPane.showMessageDialog(this, "Formato de fecha inválido. Use: YYYY-MM-DD");
             return false;
         }
         
-        // Validar que inicio sea 1 de julio
+
         if (!txtFechaInicio.getText().endsWith("-07-01")) {
             JOptionPane.showMessageDialog(this, "La fecha de inicio debe ser 1 de julio (YYYY-07-01)");
             return false;
         }
         
-        // Validar que fin sea 30 de junio
+
         if (!txtFechaFin.getText().endsWith("-06-30")) {
             JOptionPane.showMessageDialog(this, "La fecha de fin debe ser 30 de junio (YYYY-06-30)");
             return false;
@@ -238,7 +238,6 @@ this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
      private void agregar() {
         if (!validarCampos()) return;
     
-    // Verificar que no se traslape con otros años fiscales
     String verificarSQL = """
         SELECT COUNT(*) FROM AnioFiscal 
         WHERE (fechaInicio <= ? AND fechaFin >= ?)
@@ -272,8 +271,7 @@ this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
         JOptionPane.showMessageDialog(this, "Error al verificar traslape: " + e.getMessage());
         return;
     }
-    
-    // Insertar nuevo año fiscal (inactivo por defecto)
+
     String insertSQL = "INSERT INTO AnioFiscal (nombre, fechaInicio, fechaFin, activo) VALUES (?, ?, ?, 0)";
     
     try (Connection con = ConexionBD.getConexion();
@@ -289,7 +287,7 @@ this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
         
         int filas = ps.executeUpdate();
         if (filas > 0) {
-            // Obtener ID generado (OPCIONAL - solo para mostrar)
+
             ResultSet keys = ps.getGeneratedKeys();
             if (keys.next()) {
                 int idGenerado = keys.getInt(1);
@@ -308,10 +306,10 @@ this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
                     JOptionPane.INFORMATION_MESSAGE);
             }
             
-            // Limpiar y recargar
+
             limpiarCampos();
             cargarTabla();
-            configurarFechaActual(); // Volver a poner fecha actual
+            configurarFechaActual();
         }
         
     } catch (SQLException e) {
@@ -367,8 +365,7 @@ this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
             JOptionPane.showMessageDialog(this, "Seleccione un año fiscal para eliminar");
             return;
         }
-        
-        // Verificar si es el año activo
+
         String verificarSQL = "SELECT activo FROM AnioFiscal WHERE idAnioFiscal = ?";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(verificarSQL)) {
@@ -450,7 +447,7 @@ this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
                 JOptionPane.INFORMATION_MESSAGE);
             
             cargarTabla();
-            buscarAnioPorID(txtID.getText()); // Refrescar estado
+            buscarAnioPorID(txtID.getText());
             
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error al activar: " + e.getMessage());

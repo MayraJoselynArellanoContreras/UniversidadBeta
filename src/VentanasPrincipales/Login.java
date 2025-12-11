@@ -260,6 +260,7 @@ setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
     
     
 }
+   
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

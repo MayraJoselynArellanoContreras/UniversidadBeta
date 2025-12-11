@@ -41,9 +41,7 @@ public class Corporacion extends javax.swing.JFrame {
     }
     
     cargarTabla();
-    // ================================
-// ORDEN PERSONALIZADO DE TABULACIÓN
-// ================================
+
 java.util.List<java.awt.Component> ordenTab = java.util.Arrays.asList(
         txtIdCorporacion,
         txtNombreCorporacion,
@@ -125,7 +123,7 @@ private void agregarCorporacion() {
                 }
             }
             
-            // Actualizar tabla y limpiar campos
+
             cargarTabla();
             limpiarCampos();
             
@@ -171,7 +169,7 @@ private void cargarTabla() {
             }
         };
         
-        // Llenar la tabla con los datos
+
         while (rs.next()) {
             modelo.addRow(new Object[]{
                 rs.getInt("idCorporacion"),  
@@ -355,15 +353,15 @@ private void limpiarCampos() {
     txtNombreCorporacion.setBackground(Color.WHITE);
     txtDireccion.setBackground(Color.WHITE);
     
-    // Restaurar estado de botones
+
     botonAgregar.setEnabled(true);
     
-    // Deseleccionar tabla
+
     if (tablaCorporaciones != null) {
         tablaCorporaciones.clearSelection();
     }
     
-    // Enfocar campo nombre
+
     txtNombreCorporacion.requestFocus();
 }
 

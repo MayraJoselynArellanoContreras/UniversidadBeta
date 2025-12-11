@@ -33,9 +33,7 @@ public class Garantias extends javax.swing.JFrame {
     public Garantias() {
   initComponents();
   setLocationRelativeTo(null);
-  // ==========================
-// NAVEGACIÓN POR TABULACIÓN
-// ==========================
+
 java.util.List<java.awt.Component> ordenTab = java.util.Arrays.asList(
     txtIdGarantia,
     txtFechaGarantia,
@@ -49,7 +47,7 @@ java.util.List<java.awt.Component> ordenTab = java.util.Arrays.asList(
     comboCorporacion,
     txtDireccionCorporacion,
     botonRegistrar,
-    botonEditarDonativo,       // Si no existe, coméntalo
+    botonEditarDonativo,     
     botonEliminarDonativo,
     botonBuscarDonativo,
     botonLimpiar,
@@ -86,7 +84,7 @@ this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
     }
 });
 
-// Enter funciona como TAB
+
 javax.swing.KeyStroke enter = javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, 0);
 javax.swing.KeyStroke tab = javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_TAB, 0);
 
@@ -108,7 +106,7 @@ this.getRootPane().getActionMap().put("tabFocus", new javax.swing.AbstractAction
     configurarPlaceholderFecha();
     habilitarCampoTarjeta();
     
-    // Agregar listener para autocompletar dirección
+
     comboCorporacion.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(java.awt.event.ActionEvent evt) {
             autocompletarDireccionCorporacion();
@@ -116,7 +114,7 @@ this.getRootPane().getActionMap().put("tabFocus", new javax.swing.AbstractAction
     });
 }
 
-// Clase para corporaciones con dirección
+
 class CorporacionItem {
     private int id;
     private String nombre;
@@ -178,7 +176,6 @@ private void cargarCorporaciones() {
     comboCorporacion.removeAllItems();
     comboCorporacion.addItem(new CorporacionItem(0, "Seleccione corporación...", ""));
     
-    // Obtener nombre Y dirección de la corporación
     String sql = "SELECT idCorporacion, nombre, direccion FROM Corporacion ORDER BY nombre";
     
     try (Connection con = ConexionBD.getConexion();
@@ -202,7 +199,6 @@ private void cargarCorporaciones() {
     }
 }
 
-// Método para autocompletar dirección
 private void autocompletarDireccionCorporacion() {
     Object selectedItem = comboCorporacion.getSelectedItem();
     if (selectedItem instanceof CorporacionItem) {
@@ -308,7 +304,7 @@ private boolean validarCampos() {
     StringBuilder errores = new StringBuilder();
     boolean hayErrores = false;
     
-    // Validar donador
+
     String idDonador = txtIdDonador.getText().trim();
     if (idDonador.isEmpty() || txtNombreDonador.getText().trim().isEmpty()) {
         errores.append("• Debe buscar y seleccionar un donador\n");
@@ -316,7 +312,7 @@ private boolean validarCampos() {
         hayErrores = true;
     }
     
-    // Validar fecha
+
     String fecha = txtFechaGarantia.getText().trim();
     if (fecha.isEmpty() || fecha.equals("dd/mm/aaaa")) {
         errores.append("• La fecha es obligatoria\n");
@@ -328,7 +324,7 @@ private boolean validarCampos() {
         hayErrores = true;
     }
     
-    // Validar cantidades
+
     String cantidadG = txtCantidadGarantizada.getText().trim();
     if (cantidadG.isEmpty()) {
         errores.append("• La cantidad garantizada es obligatoria\n");
@@ -369,7 +365,7 @@ private boolean validarCampos() {
         }
     }
     
-    // Validar método de pago
+
     if (comboMetodoPago.getSelectedIndex() <= 0) {
         errores.append("• Debe seleccionar un método de pago\n");
         comboMetodoPago.setBackground(new Color(255, 200, 200));
@@ -390,7 +386,6 @@ private boolean validarCampos() {
         }
     }
     
-    // Validar número de pagos
     if (comboNumeroPagos.getSelectedIndex() <= 0) {
         errores.append("• Debe seleccionar número de pagos\n");
         comboNumeroPagos.setBackground(new Color(255, 200, 200));
@@ -404,7 +399,7 @@ private boolean validarCampos() {
         hayErrores = true;
     }
     
-    // Validar dirección de corporación
+
     String direccion = txtDireccionCorporacion.getText().trim();
     if (direccion.isEmpty()) {
         errores.append("• La dirección de la corporación es obligatoria\n");
@@ -1183,6 +1178,7 @@ private String calcularCirculoDonador(BigDecimal montoDonativo) {
         txtCantidadGarantizada = new javax.swing.JTextField();
         txtCantidadEnviada = new javax.swing.JTextField();
         txtDireccionCorporacion = new javax.swing.JTextField();
+        botonGarantiasPendientes = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -1325,6 +1321,9 @@ private String calcularCirculoDonador(BigDecimal montoDonativo) {
 
         txtDireccionCorporacion.setEditable(false);
 
+        botonGarantiasPendientes.setIcon(new javax.swing.ImageIcon("C:\\Users\\contr\\Downloads\\book-open-reader.png")); // NOI18N
+        botonGarantiasPendientes.setText("Garantias Pendientes");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -1375,7 +1374,8 @@ private String calcularCirculoDonador(BigDecimal montoDonativo) {
                                         .addComponent(botonEliminarDonativo, javax.swing.GroupLayout.Alignment.TRAILING)
                                         .addComponent(botonBuscarDonativo, javax.swing.GroupLayout.Alignment.TRAILING)
                                         .addComponent(botonEditarDonativo, javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(botonLimpiar, javax.swing.GroupLayout.Alignment.TRAILING))
+                                        .addComponent(botonLimpiar, javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(botonGarantiasPendientes, javax.swing.GroupLayout.Alignment.TRAILING))
                                     .addComponent(botonRegistrar))
                                 .addGap(28, 28, 28))
                             .addGroup(layout.createSequentialGroup()
@@ -1433,33 +1433,39 @@ private String calcularCirculoDonador(BigDecimal montoDonativo) {
                                 .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(comboMetodoPago, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(comboMetodoPago, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(botonEditarDonativo)))
                                 .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(comboNumeroPagos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(botonEditarDonativo))
-                                .addGap(15, 15, 15)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel8)
-                                    .addComponent(txtNumTDC, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(botonLimpiar)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(37, 37, 37)
+                                .addComponent(botonBuscarDonativo)
+                                .addGap(84, 84, 84)))
+                        .addGap(35, 35, 35)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel8)
+                            .addComponent(txtNumTDC, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
                                 .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(jLabel9)
                                     .addComponent(comboCorporacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel10)
-                                    .addComponent(txtDireccionCorporacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(35, 35, 35)
-                                .addComponent(jLabel11)
-                                .addGap(12, 12, 12))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(37, 37, 37)
-                                .addComponent(botonBuscarDonativo)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(botonLimpiar)
-                                .addGap(70, 70, 70)))
+                                .addGap(18, 18, 18))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(botonGarantiasPendientes)
+                                .addGap(33, 33, 33)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel10)
+                            .addComponent(txtDireccionCorporacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(35, 35, 35)
+                        .addComponent(jLabel11)
+                        .addGap(12, 12, 12)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1551,6 +1557,7 @@ private String calcularCirculoDonador(BigDecimal montoDonativo) {
     private javax.swing.JButton botonBuscarDonativo;
     private javax.swing.JButton botonEditarDonativo;
     private javax.swing.JButton botonEliminarDonativo;
+    private javax.swing.JButton botonGarantiasPendientes;
     private javax.swing.JButton botonLimpiar;
     private javax.swing.JButton botonRegistrar;
     private javax.swing.JButton botonVolver;

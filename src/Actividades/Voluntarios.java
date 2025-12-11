@@ -30,7 +30,6 @@ public class Voluntarios extends javax.swing.JFrame {
         cargarTablaVoluntarios();
         configurarFechaRegistro();
         
-        // --- ORDEN PERSONALIZADO DE TABULACIÓN ---
 java.util.List<java.awt.Component> ordenTab = java.util.Arrays.asList(
     txtNombre,
     txtTelefono,
@@ -49,7 +48,6 @@ java.util.List<java.awt.Component> ordenTab = java.util.Arrays.asList(
     tablaVoluntarios
 );
 
-// Política personalizada de tabulación
 setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
 
     @Override
@@ -80,11 +78,8 @@ setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
     }
 });
 
-        
-        // Inicialmente deshabilitar botón de editar
         botonEditar.setEnabled(false);
-        
-        // Configurar doble clic en tabla
+
         tablaVoluntarios.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -96,7 +91,7 @@ setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
     }
     
     private void configurarFechaRegistro() {
-        // Configurar formato de fecha
+
         try {
             txtFechaRegistro.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(
                 new javax.swing.text.MaskFormatter("####-##-##")));
@@ -150,7 +145,7 @@ setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
             
             tablaVoluntarios.setModel(modelo);
             
-            // Ajustar anchos de columnas
+
             if (tablaVoluntarios.getColumnCount() >= 9) {
                 tablaVoluntarios.getColumnModel().getColumn(0).setPreferredWidth(50);   // ID
                 tablaVoluntarios.getColumnModel().getColumn(1).setPreferredWidth(150);  // Nombre

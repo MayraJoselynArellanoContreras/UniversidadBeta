@@ -42,13 +42,10 @@ public class Donadores extends javax.swing.JFrame {
         }
     }
 });
-    
-    // ================================
-// ORDEN PERSONALIZADO DE TABULACIÓN
-// ================================
+
 java.util.List<java.awt.Component> ordenTab = java.util.Arrays.asList(
         txtIdDonador,
-        botonGenerarId,   // si NO existe quítalo
+        botonGenerarId,  
         txtNombre,
         txtDireccion,
         txtTelefono,

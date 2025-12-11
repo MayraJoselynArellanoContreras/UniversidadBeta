@@ -34,7 +34,6 @@ public class Eventos extends javax.swing.JFrame {
         cargarTablaEventos();
         configurarFecha();
         
-        // --- ORDEN PERSONALIZADO DE TABULACIÓN ---
 java.util.List<java.awt.Component> ordenTab = java.util.Arrays.asList(
     txtNombreEvento,
     txtFecha,
@@ -81,15 +80,13 @@ setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
     }
 });
 
-        
-        // Inicialmente deshabilitar botón de editar
         botonEditar.setEnabled(false);
         
-        // Configurar doble clic en tabla
+
         tablaEventos.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                if (evt.getClickCount() == 2) { // Doble clic
+                if (evt.getClickCount() == 2) {
                     cargarEventoDesdeTabla();
                 }
             }
@@ -97,7 +94,7 @@ setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
     }
     
     private void configurarFecha() {
-        // Configurar formato de fecha
+
         try {
             txtFecha.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(
                 new javax.swing.text.MaskFormatter("####-##-##")));
@@ -120,7 +117,6 @@ setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
                 comboTipo.addItem(rs.getString("tipo"));
             }
             
-            // Si no hay tipos en la BD, agregar los básicos
             if (comboTipo.getItemCount() == 1) {
                 comboTipo.addItem("Carnaval");
                 comboTipo.addItem("Cena Baile");
@@ -134,7 +130,7 @@ setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
                 JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
             
-            // En caso de error, cargar tipos por defecto
+
             comboTipo.removeAllItems();
             comboTipo.addItem("Seleccione tipo...");
             comboTipo.addItem("Carnaval");
@@ -184,7 +180,6 @@ setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
             
             tablaEventos.setModel(modelo);
             
-            // Ajustar anchos de columnas
             if (tablaEventos.getColumnCount() >= 7) {
                 tablaEventos.getColumnModel().getColumn(0).setPreferredWidth(60);   // ID
                 tablaEventos.getColumnModel().getColumn(1).setPreferredWidth(150);  // Nombre
@@ -261,7 +256,6 @@ private void cargarDatosEnFormulario(ResultSet rs) throws SQLException {
         txtFecha.setText(new java.text.SimpleDateFormat("yyyy-MM-dd").format(fechaSQL));
     }
     
-    // Seleccionar tipo
     String tipo = rs.getString("tipo");
     for (int i = 0; i < comboTipo.getItemCount(); i++) {
         if (comboTipo.getItemAt(i).equals(tipo)) {
@@ -273,11 +267,9 @@ private void cargarDatosEnFormulario(ResultSet rs) throws SQLException {
     txtLugar.setText(rs.getString("lugar"));
     txtDescripcion.setText(rs.getString("descripcion"));
     
-    // Cargar recaudación (formateada como número)
     double metaRecaudacion = rs.getDouble("metaRecaudacion");
     txtRecaudacion.setText(String.valueOf(metaRecaudacion));
     
-    // Habilitar botón de editar y deshabilitar agregar
     botonEditar.setEnabled(true);
     botonGuardarEvento.setEnabled(false);
 }
@@ -286,22 +278,20 @@ private boolean validarCampos() {
     StringBuilder errores = new StringBuilder();
     boolean hayErrores = false;
     
-    // Resetear colores
+
     txtNombreEvento.setBackground(Color.WHITE);
     txtFecha.setBackground(Color.WHITE);
     comboTipo.setBackground(Color.WHITE);
     txtLugar.setBackground(Color.WHITE);
-    txtRecaudacion.setBackground(Color.WHITE); // ahora es JTextField
+    txtRecaudacion.setBackground(Color.WHITE); 
     
-    // Validar nombre
     String nombre = txtNombreEvento.getText().trim();
     if (nombre.isEmpty()) {
         errores.append("• El nombre del evento es obligatorio\n");
         txtNombreEvento.setBackground(new Color(255, 200, 200));
         hayErrores = true;
     }
-    
-    // Validar fecha
+
     String fecha = txtFecha.getText().trim();
     if (fecha.isEmpty() || fecha.equals("____-__-__")) {
         errores.append("• La fecha es obligatoria\n");
@@ -319,14 +309,14 @@ private boolean validarCampos() {
         }
     }
     
-    // Validar tipo
+
     if (comboTipo.getSelectedIndex() <= 0) {
         errores.append("• Debe seleccionar un tipo de evento\n");
         comboTipo.setBackground(new Color(255, 200, 200));
         hayErrores = true;
     }
     
-    // Validar lugar
+
     String lugar = txtLugar.getText().trim();
     if (lugar.isEmpty()) {
         errores.append("• El lugar es obligatorio\n");
@@ -334,7 +324,7 @@ private boolean validarCampos() {
         hayErrores = true;
     }
     
-    // Validar recaudación (ahora con JTextField normal)
+
     String recaudacionTexto = txtRecaudacion.getText().trim();
     if (recaudacionTexto.isEmpty()) {
         errores.append("• La meta de recaudación es obligatoria\n");

@@ -29,7 +29,7 @@ public class CirculoDonador extends javax.swing.JFrame {
         initComponents();
         setLocationRelativeTo(null);
          cargarTabla();
-         // --- Configurar navegación por tabulación ---
+
 this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
     @Override
     public java.awt.Component getComponentAfter(java.awt.Container aContainer, java.awt.Component aComponent) {
@@ -87,7 +87,7 @@ this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
     modeloTabla = new DefaultTableModel(columnas, 0) {
         @Override
         public boolean isCellEditable(int row, int column) {
-            return false; // Tabla de solo lectura
+            return false; 
         }
     };
     
@@ -121,13 +121,13 @@ private void cargarTabla() {
          PreparedStatement ps = con.prepareStatement(sql);
          ResultSet rs = ps.executeQuery()) {
 
-        // 1. OBTENER el modelo ACTUAL (el que ya tiene columnas)
+
         DefaultTableModel modelo = (DefaultTableModel) tablaCirculos.getModel();
         
-        // 2. LIMPIAR solo los datos (NO las columnas)
+
         modelo.setRowCount(0);
         
-        // 3. AGREGAR datos al modelo existente
+
         while (rs.next()) {
             int id = rs.getInt("idCirculo");
             String nombre = rs.getString("nombre");
@@ -141,7 +141,7 @@ private void cargarTabla() {
                 String.format("$%,.2f y más", minimo) : 
                 String.format("$%,.2f - $%,.2f", minimo, maximo);
             
-            // Agregar al modelo EXISTENTE
+
             modelo.addRow(new Object[]{
                 String.valueOf(id),
                 nombre,
@@ -151,7 +151,7 @@ private void cargarTabla() {
             });
         }
 
-        // 4. Configurar columnas (solo si es necesario)
+
         if (tablaCirculos.getColumnCount() >= 5) {
             tablaCirculos.getColumnModel().getColumn(0).setPreferredWidth(60);
             tablaCirculos.getColumnModel().getColumn(1).setPreferredWidth(150);
@@ -177,7 +177,7 @@ private void cargarTabla() {
         txtMontoMinimo.setBackground(Color.WHITE);
         txtMontoMaximo.setBackground(Color.WHITE);
         
-        // Validar nombre
+
         String nombre = txtNombreCirculo.getText().trim();
         if (nombre.isEmpty()) {
             errores.append("• El nombre es obligatorio\n");
@@ -185,7 +185,7 @@ private void cargarTabla() {
             hayErrores = true;
         }
         
-        // Validar monto mínimo
+
         String strMinimo = txtMontoMinimo.getText().trim();
         if (strMinimo.isEmpty()) {
             errores.append("• El monto mínimo es obligatorio\n");
@@ -206,7 +206,7 @@ private void cargarTabla() {
             }
         }
         
-        // Validar monto máximo (si está presente)
+
         String strMaximo = txtMontoMaximo.getText().trim();
         if (!strMaximo.isEmpty()) {
             try {
@@ -247,7 +247,7 @@ private void cargarTabla() {
         return;
     }
     
-    // Usar RETURN_GENERATED_KEYS para obtener el ID generado
+
     String sql = "INSERT INTO CirculoDonador (nombre, minimo, maximo) VALUES (?, ?, ?)";
     
     try (Connection con = ConexionBD.getConexion();
@@ -266,16 +266,16 @@ private void cargarTabla() {
             ps.setDouble(3, Double.parseDouble(strMaximo));
         }
         
-        // Ejecutar INSERT
+
         int filasAfectadas = ps.executeUpdate();
         
         if (filasAfectadas > 0) {
-            // Obtener el ID generado
+
             ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {
                 int idGenerado = generatedKeys.getInt(1);
                 
-                // MOSTRAR EL ID EN EL CAMPO txtIdCirculo
+
                 txtIdCirculo.setText(String.valueOf(idGenerado));
                 txtIdCirculo.setForeground(Color.BLUE);
                 
@@ -289,7 +289,7 @@ private void cargarTabla() {
                     "Registro exitoso", 
                     JOptionPane.INFORMATION_MESSAGE);
             } else {
-                // Si no se puede obtener el ID generado
+
                 txtIdCirculo.setText("(Nuevo)");
                 JOptionPane.showMessageDialog(this, 
                     "Círculo creado, pero no se pudo obtener el ID",
@@ -297,7 +297,7 @@ private void cargarTabla() {
                     JOptionPane.WARNING_MESSAGE);
             }
             
-            // Actualizar tabla
+
             cargarTabla();
             botonEditar.setEnabled(true);
         }
@@ -311,7 +311,7 @@ private void cargarTabla() {
     }
 }
 
-// Método auxiliar para formatear rango
+
 private String obtenerRango(double minimo, Double maximo) {
     if (maximo == null) {
         return String.format("$%,.2f y más", minimo);
@@ -325,7 +325,7 @@ private void cargarCirculoDesdeTabla() {
         return;
     }
     
-    // Obtener modelo ACTUAL de la tabla
+
     DefaultTableModel modelo = (DefaultTableModel) tablaCirculos.getModel();
     String idCirculo = modelo.getValueAt(fila, 0).toString();
     buscarCirculoPorID(idCirculo);
@@ -349,14 +349,14 @@ private void buscarCirculoPorID(String idCirculo) {
         ResultSet rs = ps.executeQuery();
         
         if (rs.next()) {
-            // CORRECCIÓN: Los campos en BD son "minimo" y "maximo", NO "montoMinimo"/"montoMaximo"
+      
             txtIdCirculo.setText(rs.getString("idCirculo"));
             txtIdCirculo.setForeground(Color.BLUE);
             
             txtNombreCirculo.setText(rs.getString("nombre"));
-            txtMontoMinimo.setText(String.valueOf(rs.getDouble("minimo"))); // ← "minimo"
+            txtMontoMinimo.setText(String.valueOf(rs.getDouble("minimo"))); 
             
-            Double maximo = rs.getDouble("maximo"); // ← "maximo"
+            Double maximo = rs.getDouble("maximo"); 
             if (rs.wasNull()) {
                 txtMontoMaximo.setText("");
             } else {
@@ -575,7 +575,7 @@ private void buscarCirculoPorID(String idCirculo) {
     }
     
   private void limpiarCampos() {
-    // Limpiar ID también
+
     txtIdCirculo.setText("");
     txtIdCirculo.setForeground(Color.BLACK);
     
@@ -583,18 +583,17 @@ private void buscarCirculoPorID(String idCirculo) {
     txtMontoMinimo.setText("");
     txtMontoMaximo.setText("");
     
-    // Resetear colores
+
     txtNombreCirculo.setBackground(Color.WHITE);
     txtMontoMinimo.setBackground(Color.WHITE);
     txtMontoMaximo.setBackground(Color.WHITE);
-    
-    // Resetear botones
+
     botonEditar.setEnabled(false);
     
-    // Deseleccionar tabla
+
     tablaCirculos.clearSelection();
     
-    // Enfocar primer campo
+
     txtNombreCirculo.requestFocus();
 }
     /**

@@ -39,9 +39,7 @@ public class Pagos extends javax.swing.JFrame {
         cargarTabla();
          this.getContentPane().setBackground(new Color(255, 235, 153));
         deshabilitarEdicion();
-        // ================================
-//   ORDEN DE TABULACIÓN PERSONALIZADO
-// ================================
+
 java.util.List<java.awt.Component> orden = java.util.Arrays.asList(
         txtGarantia,
         botonBuscarGarantia,
@@ -309,7 +307,7 @@ this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
         };
         tablaPagos.setModel(modeloTabla);
         
-        // Doble clic en tabla
+
         tablaPagos.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -326,7 +324,7 @@ this.setFocusTraversalPolicy(new java.awt.FocusTraversalPolicy() {
     }
     
 private void buscarGarantia(String idGarantia) {
-    // QUITAR los comentarios /**/ del SQL
+
     String sql = "SELECT G.idGarantia, G.cantidadGarantizada, " +
                  "ISNULL(G.cantidadEnviada, 0) as cantidadEnviada, " +
                  "D.nombre as donador, G.fechaGarantia " +
@@ -345,7 +343,7 @@ private void buscarGarantia(String idGarantia) {
             double cantidadEnviada = rs.getDouble("cantidadEnviada");
             String donador = rs.getString("donador");
             
-            // Calcular estado
+
             String estado = "Activa";
             double saldoPendiente = cantidadGarantizada - cantidadEnviada;
             
@@ -396,7 +394,7 @@ private void registrarPago(){
         return;
     }
     
-    // Extraer ID de garantía
+
     String textoGarantia = txtGarantia.getText().trim();
     String[] partes = textoGarantia.split(" - ");
     if (partes.length < 1) {
@@ -406,10 +404,10 @@ private void registrarPago(){
     
     String idGarantia = partes[0];
     
-    // Validar fecha (ahora es un JTextField normal)
-    String fechaPago = txtFechaPago.getText().trim(); // Esto ahora es un JTextField
+
+    String fechaPago = txtFechaPago.getText().trim(); 
     
-    // Validar formato de fecha (yyyy-MM-dd)
+
     if (!fechaPago.matches("\\d{2}/\\d{2}/\\d{4}")) {
         JOptionPane.showMessageDialog(this,
             "Formato de fecha inválido.\nUse: DD/MM/YYYY",
@@ -418,7 +416,7 @@ private void registrarPago(){
         return;
     }
     
-    // Verificar saldo
+
     String verificarSaldoSQL = "SELECT cantidadGarantizada, ISNULL(cantidadEnviada, 0) as cantidadEnviada " +
                                "FROM Garantia WHERE idGarantia = ?";
     
@@ -450,7 +448,6 @@ private void registrarPago(){
         return;
     }
     
-    // Registrar el pago
     String insertSQL = "INSERT INTO Pago (idGarantia, montoPago, fechaPago, observaciones) VALUES (?, ?, ?, ?)";
     
     try (Connection con = ConexionBD.getConexion();
@@ -458,13 +455,13 @@ private void registrarPago(){
         
         ps.setString(1, idGarantia);
         ps.setDouble(2, Double.parseDouble(txtMonto.getText().trim()));
-        ps.setString(3, fechaPago); // ← Usar la fecha validada
+        ps.setString(3, fechaPago); 
         ps.setString(4, txtObservaciones.getText().trim());
         
         int filasAfectadas = ps.executeUpdate();
         
         if (filasAfectadas > 0) {
-            // Actualizar cantidadEnviada en Garantia
+
             String actualizarGarantiaSQL = "UPDATE Garantia SET cantidadEnviada = ISNULL(cantidadEnviada, 0) + ? WHERE idGarantia = ?";
             
             try (PreparedStatement psUpdate = con.prepareStatement(actualizarGarantiaSQL)) {
@@ -473,7 +470,7 @@ private void registrarPago(){
                 psUpdate.executeUpdate();
             }
             
-            // Obtener ID del pago generado
+
             ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {
                 int idGenerado = generatedKeys.getInt(1);
@@ -725,7 +722,7 @@ public void historial(){
             double monto = rs.getDouble("montoPago");
             totalPagado += monto;
             
-            // Obtener totalGarantia solo en la primera iteración
+
             if (numPagos == 1) {
                 totalGarantia = rs.getDouble("totalGarantia");
             }
@@ -752,7 +749,7 @@ public void historial(){
             historial.append("• Porcentaje pagado: ").append(String.format("%.1f%%", (totalPagado / totalGarantia) * 100));
         }
         
-        // Mostrar historial
+
         JTextArea textArea = new JTextArea(historial.toString(), 20, 50);
         textArea.setEditable(false);
         
